@@ -1,0 +1,12 @@
+requests==2.25.1
+urbandictionary_top==0.3
+Flask==2.0.0
+async_timeout==3.0.1
+discord.py==1.7.2
+pokepy==0.6.1
+youtube_dl==2021.4.26
+aiohttp==3.7.4.post0
+discord==1.0.1
+Pillow==8.2.0
+pypokedex==1.5.1
+python-decouple==3.4
