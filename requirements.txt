@@ -1,7 +1,0 @@
-discord.py==1.7.1
-Flask==1.1.2
-aiohttp==3.7.4.post0
-wavelink==0.9.9
-urbandictionary_top==0.3
-discord==1.0.1
-python-decouple==3.4
