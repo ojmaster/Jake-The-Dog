@@ -7,5 +7,5 @@ pip install pokepy==0.6.1 --no-deps
 ```
 make a .env file, the contents of the file should look like this:
 ```
-TOKEN = {'YOUR TOKEN HERE'}
+TOKEN = 'YOUR TOKEN HERE'
 ```
