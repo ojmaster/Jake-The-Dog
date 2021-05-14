@@ -127,7 +127,9 @@ class Pokemon(commands.Cog):
 
   async def entry(self, pokemon):
     pk = pykemon.get_pokemon_species(pokemon)
-    entry = pk.flavor_text_entries[1].flavor_text
+    for flavor in pk.flavor_text_entries:
+      if flavor.language.name == 'en':
+        entry = flavor.flavor_text
     entry = entry.replace("\n", " ")
     entry = entry.split()
     i = 6
