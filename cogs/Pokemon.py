@@ -3,8 +3,7 @@ from discord.ext import commands
 import pypokedex
 import urllib.request
 from PIL import Image
-import os, json
-import requests
+import os
 import pokepy
 
 
@@ -21,8 +20,8 @@ class Pokemon(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
-  @commands.command(aliases = ["pokemon", "poke"])
-  async def pokedex(self, ctx, pimg, poke = None):
+  @commands.command(aliases = ["poke"])
+  async def pokemon(self, ctx, pimg, poke = None):
     """
     Search up a pokemon
     Usage: pokedex <pokemon>
@@ -90,6 +89,19 @@ class Pokemon(commands.Cog):
       embed.set_image(url="attachment://shinyf.png")
       await ctx.send(file = discord.File("shinyf.png"), embed = embed)
       os.remove("shinyf.png")
+
+
+  @commands.command()
+  async def pitems(self, ctx, item):
+    embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
+    embed.add_field(name = "ID", value = await self.iid(item))
+    embed.add_field(name = "Category", value = await self.icat(item))
+    embed.add_field(name = "Entry", value = await self.iflvtxt(item))
+    embed.add_field(name = "Effect", value = await self.ieffect(item))
+    await self.ipic(item)
+    embed.set_thumbnail(url = "attachment://item.png")
+    await ctx.send(file = discord.File("item.png"), embed = embed)
+    os.remove("item.png")
 
 
   async def ptype(self, pokemon):
@@ -174,6 +186,38 @@ class Pokemon(commands.Cog):
     img = img.resize((200,200), Image.ANTIALIAS)
     img.save("shinyb.png")
   
+  async def iname(self, name):
+    pit = pykemon.get_item(name)
+    name = pit.name.capitalize()
+    return name
+
+  async def iid(self, id):
+    pit = pykemon.get_item(id)
+    pid = str(pit.id)
+    return pid
+
+  async def icat(self, category):
+    pit = pykemon.get_item(category)
+    category = pit.category.name.capitalize()
+    return category
+
+  async def ieffect(self, effect):
+    pit = pykemon.get_item(effect)
+    effect = pit.effect_entries[0].effect
+    effect = effect.replace("\n", " ")
+    return effect
+
+  async def iflvtxt(self, flvtxt):
+    pit = pykemon.get_item(flvtxt)
+    flvtxt = pit.flavor_text_entries[1].text
+    return flvtxt
+
+  async def ipic(self, pic):
+    pic = pykemon.get_item(pic)
+    urllib.request.urlretrieve(pic.sprites.default, "item.png")
+    img = Image.open("item.png")
+    img = img.resize((200,200), Image.ANTIALIAS)
+    img.save("item.png")
 
 
 def setup(bot):
