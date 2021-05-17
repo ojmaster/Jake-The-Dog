@@ -16,14 +16,8 @@ class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
-  @commands.Cog.listener()
-  async def on_command_error(self, ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-      await ctx.send("Hah you don't have the right permissions for that")
-    if isinstance(error, commands.MissingRequiredArgument):
-      await ctx.send("Please enter all required arguements.")
 
-  @commands.command(pass_context=True)
+  @commands.command()
   async def ping(self, ctx):
     """Pong!"""
     time_1 = time.perf_counter()
@@ -87,7 +81,7 @@ class Utility(commands.Cog):
   async def updates(self, ctx):
     """See all recent updates to the bot!"""
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Pokemon", value="Updated the Pokedex feature \nto add more detail", inline=True)
+    embed.add_field(name="Pokemon", value="Added **Main Region** to pokedex and the entry will now show the entry from the generation the pokemon was introduced", inline=True)
     embed.set_footer(text="v0.5")
     await ctx.send(embed=embed)
 
