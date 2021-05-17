@@ -20,10 +20,11 @@ class Pokemon(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
-  @commands.command(aliases = ["poke"])
+
+  @commands.command(aliases = ["poke", "Poke", "Pokemon"])
   async def pokemon(self, ctx, pimg, poke = None):
     """
-    Search up a pokemon
+    Pokeedex entry for Pokemon
     Usage: pokedex <pokemon>
     """
     if pimg == "back":
@@ -34,6 +35,7 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Species", value = await self.pspecies(poke))
       embed.add_field(name = "Height", value = await self.pheight(poke))
       embed.add_field(name = "Weight", value = await self.pweight(poke))
+      embed.add_field(name = "Main Region", value = await self.region(poke))
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       await self.bimg(poke)
       embed.set_image(url="attachment://pokemonb.png")
@@ -47,16 +49,17 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Species", value = await self.pspecies(pimg))
       embed.add_field(name = "Height", value = await self.pheight(pimg))
       embed.add_field(name = "Weight", value = await self.pweight(pimg))
+      embed.add_field(name = "Main Region", value = await self.region(pimg))
       embed.add_field(name = "Entry", value = await self.entry(pimg), inline = False)
       await self.pimg(pimg)
       embed.set_image(url="attachment://pokemonf.png")
       await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
       os.remove("pokemonf.png")
 
-  @commands.command()
+  @commands.command(aliases = ["Shiny"])
   async def shiny(self, ctx, pimg, poke=None):
     """
-    Pokemon Shiny Sprite
+    Shiny entry for pokemon
     Usage: shiny <pokemon>
     """
     if pimg == "back":
@@ -69,6 +72,7 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Species", value = await self.pspecies(poke))
       embed.add_field(name = "Height", value = await self.pheight(poke))
       embed.add_field(name = "Weight", value = await self.pweight(poke))
+      embed.add_field(name = "Main Region", value = await self.region(poke))
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       await self.bsimg(poke)
       embed.set_image(url="attachment://shinyb.png")
@@ -84,6 +88,7 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Species", value = await self.pspecies(pimg))
       embed.add_field(name = "Height", value = await self.pheight(pimg))
       embed.add_field(name = "Weight", value = await self.pweight(pimg))
+      embed.add_field(name = "Main Region", value = await self.region(pimg))
       embed.add_field(name = "Entry", value = await self.entry(pimg), inline = False)
       await self.psimg(pimg)
       embed.set_image(url="attachment://shinyf.png")
@@ -91,8 +96,11 @@ class Pokemon(commands.Cog):
       os.remove("shinyf.png")
 
 
-  @commands.command()
-  async def pitems(self, ctx, item):
+  @commands.command(aliases = ["Pitem"])
+  async def pitem(self, ctx, item):
+    """
+    PokeItem info! 
+    """
     embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
     embed.add_field(name = "ID", value = await self.iid(item))
     embed.add_field(name = "Category", value = await self.icat(item))
@@ -127,8 +135,11 @@ class Pokemon(commands.Cog):
 
   async def entry(self, pokemon):
     pk = pykemon.get_pokemon_species(pokemon)
+    vers = pk.generation.name
+    vers = await self.gen(vers)
+    vers = await self.game(vers)
     for flavor in pk.flavor_text_entries:
-      if flavor.language.name == 'en':
+      if flavor.language.name == 'en' and flavor.version.name == vers:
         entry = flavor.flavor_text
     entry = entry.replace("\n", " ")
     entry = entry.split()
@@ -220,6 +231,48 @@ class Pokemon(commands.Cog):
     img = Image.open("item.png")
     img = img.resize((200,200), Image.ANTIALIAS)
     img.save("item.png")
+
+  async def gen(self, gen):
+    if gen == "generation-i":
+      return 1
+    elif gen == "generation-ii":
+      return 2
+    elif gen == "generation-iii":
+      return 3
+    elif gen == 'generation-iv':
+      return 4
+    elif gen == 'generation-v':
+      return 5
+    elif gen == 'generation-vi':
+      return 6
+    elif gen == 'generation-vii':
+      return 7
+    elif gen == 'generation-viii':
+      return 8
+
+  async def game(self, game):
+    if game == 1:
+      return 'red'
+    elif game == 2:
+      return 'gold'
+    elif game == 3:
+      return 'ruby'
+    elif game == 4:
+      return 'diamond'
+    elif game == 5:
+      return 'black'
+    elif game == 6:
+      return 'x'
+    elif game == 7:
+      return 'sun'
+    elif game == 8:
+      return 'sword'
+
+  async def region(self, gen):
+    poke = pykemon.get_pokemon_species(gen).generation.name
+    poke = await self.gen(poke)
+    reg = pykemon.get_generation(poke)
+    return reg.main_region.name.capitalize()
 
 
 def setup(bot):
