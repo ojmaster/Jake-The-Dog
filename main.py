@@ -34,13 +34,10 @@ elif act == 3:
 elif act == 4:
   dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Distant Lands"))
 
-@tasks.loop(hours=1.5)
-async def change_status():
-    act()
-    await dact
 
 @bot.event
 async def on_ready():
+    print('------')
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
@@ -180,6 +177,5 @@ async def unload(ctx, extension):
     await ctx.send(f'Extension "{extension}" unloaded')
   else:
     ctx.send("Insufficient Permissions")
-
 
 bot.run(config('TOKEN'))
