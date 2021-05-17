@@ -16,6 +16,12 @@ class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
+  @commands.Cog.listener()
+  async def on_command_error(self, ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+      await ctx.send("Hah you don't have the right permissions for that")
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.send("Please enter all required arguements.")
 
   @commands.command()
   async def ping(self, ctx):
