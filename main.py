@@ -24,15 +24,18 @@ client = discord.Client()
 
 bot.remove_command('help')
 
-act = random.randint(1, 4)
-if act == 1:
-  dact = bot.change_presence(activity=discord.Game(name="BMO"))
-elif act == 2:
-  dact = bot.change_presence(activity=discord.Streaming(name="Pirates of the Enchiridion", url="https://www.twitch.tv/0jmaster"))
-elif act == 3:
-  dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Island Song"))
-elif act == 4:
-  dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Distant Lands"))
+async def presence():
+    act = random.randint(1, 4)
+    if act == 1:
+      dact = bot.change_presence(activity=discord.Game(name="BMO"))
+    elif act == 2:
+      dact = bot.change_presence(activity=discord.Streaming(name="Pirates of the Enchiridion", url="https://www.twitch.tv/0jmaster"))
+    elif act == 3:
+      dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Island Song"))
+    elif act == 4:
+      dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Distant Lands"))
+    dact = await dact
+    return dact
 
 
 @bot.event
@@ -43,10 +46,16 @@ async def on_ready():
     print(bot.user.id)
     print('------')
     await listservers()
-    await dact
+    await presence()
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
     await client.login(config('TOKEN'))
+    change_stat.start()
+
+@tasks.loop(seconds = 7200)
+async def change_stat():
+    await presence()
+    print("Presence Changed!")
 
 
 async def listservers():
