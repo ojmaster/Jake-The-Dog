@@ -3,7 +3,7 @@ from discord.ext import commands
 import pypokedex
 import urllib.request
 from PIL import Image
-import os
+import os, requests, json, difflib
 import pokepy
 
 
@@ -28,9 +28,10 @@ class Pokemon(commands.Cog):
     Usage: pokedex <pokemon>
     """
     if pimg == "back":
-      pokem = pypokedex.get(name=poke)
       embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
-      embed.add_field(name = "ID", value = str(pokem.dex))
+      if not any(map(str.isdigit, poke)):
+          poke = await self.pknamecheck(poke)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
       embed.add_field(name = "Height", value = await self.pheight(poke))
@@ -42,9 +43,10 @@ class Pokemon(commands.Cog):
       await ctx.send(file = discord.File("pokemonb.png"), embed = embed)
       os.remove("pokemonb.png")
     else: 
-      pokem = pypokedex.get(name=pimg)
       embed = discord.Embed(title = await self.pokename(pimg), color = discord.Color.red())
-      embed.add_field(name = "ID", value = str(pokem.dex))
+      if not any(map(str.isdigit, pimg)):
+          pimg = await self.pknamecheck(pimg)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(pimg).id)
       embed.add_field(name = "Type", value = await self.ptype(pimg))
       embed.add_field(name = "Species", value = await self.pspecies(pimg))
       embed.add_field(name = "Height", value = await self.pheight(pimg))
@@ -63,11 +65,12 @@ class Pokemon(commands.Cog):
     Usage: shiny <pokemon>
     """
     if pimg == "back":
-      pokem = pypokedex.get(name=poke)
       stitle = str(await self.pokename(poke))
       embedtitle = f'Shiny {stitle}'
       embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      embed.add_field(name = "ID", value = str(pokem.dex))
+      if not any(map(str.isdigit, poke)):
+          poke = await self.pknamecheck(poke)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
       embed.add_field(name = "Height", value = await self.pheight(poke))
@@ -79,11 +82,12 @@ class Pokemon(commands.Cog):
       await ctx.send(file = discord.File("shinyb.png"), embed = embed)
       os.remove("shinyb.png")
     else: 
-      pokem = pypokedex.get(name=pimg)
       stitle = str(await self.pokename(pimg))
       embedtitle = f'Shiny {stitle}'
       embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      embed.add_field(name = "ID", value = str(pokem.dex))
+      if not any(map(str.isdigit, pimg)):
+          pimg = await self.pknamecheck(pimg)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(pimg).id)
       embed.add_field(name = "Type", value = await self.ptype(pimg))
       embed.add_field(name = "Species", value = await self.pspecies(pimg))
       embed.add_field(name = "Height", value = await self.pheight(pimg))
@@ -99,9 +103,12 @@ class Pokemon(commands.Cog):
   @commands.command(aliases = ["Pitem"])
   async def pitem(self, ctx, item):
     """
-    PokeItem info! 
+    Pokedex entry for PokeItem! 
+    Usage: pitem <item>
     """
     embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
+    if not any(map(str.isdigit, item)):
+      item = await self.namecheck(item)
     embed.add_field(name = "ID", value = await self.iid(item))
     embed.add_field(name = "Category", value = await self.icat(item))
     embed.add_field(name = "Entry", value = await self.iflvtxt(item))
@@ -121,9 +128,14 @@ class Pokemon(commands.Cog):
     return ptype
 
 
+
   async def pokename(self, pokemon):
-    pk = pykemon.get_pokemon_species(pokemon)
-    name = pk.name.capitalize()
+    if any(map(str.isdigit, pokemon)):
+        pk = pykemon.get_pokemon_species(pokemon)
+        name = pk.name.capitalize()
+    else: 
+        pk = await self.pknamecheck(pokemon)
+        name = pk.capitalize()
     return name
 
 
@@ -200,8 +212,12 @@ class Pokemon(commands.Cog):
     img.save("shinyb.png")
   
   async def iname(self, name):
-    pit = pykemon.get_item(name)
-    name = pit.name.capitalize()
+    if any(map(str.isdigit, name)):
+        pit = pykemon.get_item(name)
+        name = pit.name.replace("-", " ").title()
+    else:
+        name = await self.namecheck(name)
+        name = name.replace("-", " ").title()
     return name
 
   async def iid(self, id):
@@ -211,7 +227,7 @@ class Pokemon(commands.Cog):
 
   async def icat(self, category):
     pit = pykemon.get_item(category)
-    category = pit.category.name.capitalize()
+    category = pit.category.name.title()
     return category
 
   async def ieffect(self, effect):
@@ -222,7 +238,9 @@ class Pokemon(commands.Cog):
 
   async def iflvtxt(self, flvtxt):
     pit = pykemon.get_item(flvtxt)
-    flvtxt = pit.flavor_text_entries[1].text
+    for flavor in pit.flavor_text_entries:
+      if flavor.language.name == 'en':
+        flvtxt = flavor.text
     return flvtxt
 
   async def ipic(self, pic):
@@ -274,6 +292,28 @@ class Pokemon(commands.Cog):
     reg = pykemon.get_generation(poke)
     return reg.main_region.name.capitalize()
 
+
+  async def namecheck(self, iitem):
+    lst = []
+    items = requests.get('https://pokeapi.co/api/v2/item/?limit=1005')
+    item = items.json()
+    item = item['results']
+    for name in item:
+        lst.append(name['name'])
+    checkitem = difflib.get_close_matches(iitem, lst)
+    checkitem = checkitem[0]
+    return checkitem
+
+  async def pknamecheck(self, pokemon):
+    lst = []
+    pokemons = requests.get('https://pokeapi.co/api/v2/pokemon/?limit=898')
+    pkm = pokemons.json()
+    pkm = pkm['results']
+    for name in pkm:
+        lst.append(name['name'])
+    checkitem = difflib.get_close_matches(pokemon, lst)
+    checkitem = checkitem[0]
+    return checkitem
 
 def setup(bot):
 	bot.add_cog(Pokemon(bot))

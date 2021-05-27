@@ -87,7 +87,8 @@ class Utility(commands.Cog):
   async def updates(self, ctx):
     """See all recent updates to the bot!"""
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Pokemon", value="Added **Main Region** to pokedex and the entry will now show the entry from the generation the pokemon was introduced", inline=True)
+    embed.add_field(name="Pokemon", value="Pokemon & PokeItem command will get\ncorrect item if spelled incorrectly", inline=True)
+    embed.add_field(name = "Minecraft", value = "Search up minecraft players with the 'mc' command")
     embed.set_footer(text="v0.5")
     await ctx.send(embed=embed)
 

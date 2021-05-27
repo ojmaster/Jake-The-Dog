@@ -1,12 +1,10 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions
-import time
 import random
-import http
 from urbandictionary_top import udtop
 import  aiohttp
 import asyncio
+import json, asyncpraw
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -100,61 +98,13 @@ class Fun(commands.Cog):
   @commands.command(aliases=['cat', 'randomcat'])
   async def neko(self, ctx):
       '''NEEKO NEEKO NEEE'''
-      #http://discordpy.readthedocs.io/en/latest/faq.html#what-does-blocking-mean
-      async with aiohttp.ClientSession() as cs:
-          async with cs.get('http://aws.random.cat/meow') as r:
-              res = await r.json()
-              emojis = [':cat2: ', ':cat: ', ':heart_eyes_cat: ']
-              await ctx.send(random.choice(emojis) + res['file'])
-
-
-  @commands.command(aliases=['rand'])
-  async def random(self, ctx, *arg):
-      '''Returns a random number or member
-
-      Usage:
-      -----------
-
-      :random
-          Pick a random number between 1 and 100
-
-      :random x
-          Pick a random number between 1 and x
-
-      :random x y
-          Pick a random number between x and y
-
-      :random user
-          Return a random online user
-      
-      :random choice Dani Eddy Shinobu
-          Select a name from a provided list
-      '''
-      if ctx.invoked_subcommand is None:
-          if not arg:
-              start = 1
-              end = 100
-          elif arg[0] == 'choice':
-              choices = list(arg)
-              choices.pop(0)
-              await ctx.send(f':congratulations: The winner is {random.choice(choices)}')
-              return
-          elif arg[0] == 'user':
-              online = self.userOnline(ctx.guild.members)
-              randomuser = random.choice(online)
-              if ctx.channel.permissions_for(ctx.author).mention_everyone:
-                  user = randomuser.mention
-              else:
-                  user = randomuser.display_name
-              await ctx.send(f':congratulations: The winner is {user}')
-              return
-          elif len(arg) == 1:
-              start = 1
-              end = int(arg[0])
-          elif len(arg) == 2:
-              start = int(arg[0])
-              end = int(arg[1])
-          await ctx.send(f'**:arrows_counterclockwise:** Random number ({start} - {end}): {random.randint(start, end)}')
+      reddit = asyncpraw.Reddit(client_id='ywFPprh9AzkjrA', client_secret = 'Y49u2M2O6hLtPbUF060F2lyzXVZezg', user_agent = 'Jake the Dog')
+      submission = await reddit.subreddit("catpics")
+      submission = await submission.random()
+      embed = discord.Embed(title = submission.title, color = discord.Color.red(), url = submission.shortlink)
+      embed.set_image(url = submission.url)
+      await ctx.send(embed = embed)
+      await reddit.close()
 
   @commands.command()
   async def rip(self, ctx, member:str):
@@ -184,7 +134,7 @@ class Fun(commands.Cog):
               'Want to hear a joke about paper? \nNevermind it’s tearable.',
               'Did you hear about the guy who lost the left side of his body? \nHe\'s alright now.',
               'My cat was just sick on the carpet, \nI don’t think it’s feline well.',
-              'Towels can’t tell jokes. \n  They have a dry sense of humor.',
+              'Towels can’t tell jokes. \nThey have a dry sense of humor.',
               'To write with a broken pencil is pointless.',
               'I went to a seafood disco last week... and pulled a mussel.',
               'What do beavers like to put on their salads? \nBranch dressing.',
@@ -199,6 +149,38 @@ class Fun(commands.Cog):
       msg = f'{random.choice(puns)}'
       pn = await ctx.send(msg)
       await pn.add_reaction(random.choice(emojis))
+
+  @commands.command()
+  async def tord(self, ctx):
+    """Truth or Dare"""
+    embed = discord.Embed(title = "Truth or Dare", color = discord.Color.dark_orange())
+    embed.add_field(name = "Truth", value = "🇹")
+    embed.add_field(name = "Dare", value = "🇩")
+    msg = await ctx.send(embed = embed)
+    await msg.add_reaction("🇹")
+    await msg.add_reaction("🇩")
+
+    def check(reaction, user):
+      return user == ctx.message.author and str(reaction.emoji) in ['🇹', '🇩']
+
+    try: 
+      reaction, user = await self.bot.wait_for('reaction_add', timeout = 7, check = check)
+      if reaction.emoji == "🇹":
+          await msg.delete()
+          data = json.load(open('./cogs/TruthOrDare/truth.json', encoding = "utf8", errors = 'ignore'))
+          values = [v for d in data['truth'] for k, v in d.items()]
+          truthem = discord.Embed(title = "Truth", description = random.choice(values), color = discord.Color.green())
+          await ctx.send(embed = truthem)
+      if reaction.emoji == "🇩":
+          await msg.delete()
+          data = json.load(open('./cogs/TruthOrDare/dare.json', encoding = "utf8", errors = 'ignore'))
+          values = [v for d in data['dare'] for k, v in d.items()]
+          dareem = discord.Embed(title = "Dare", description = random.choice(values), color = discord.Color.dark_magenta())
+          await ctx.send(embed = dareem)
+
+    except asyncio.TimeoutError:
+      embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
+      await ctx.send(embed = embed)
 
 def setup(bot):
 	bot.add_cog(Fun(bot))

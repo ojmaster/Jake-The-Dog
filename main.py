@@ -52,10 +52,9 @@ async def on_ready():
     await client.login(config('TOKEN'))
     change_stat.start()
 
-@tasks.loop(seconds = 7200)
+@tasks.loop(hours = 3)
 async def change_stat():
     await presence()
-    print("Presence Changed!")
 
 
 async def listservers():
