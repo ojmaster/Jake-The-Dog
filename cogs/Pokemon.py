@@ -119,14 +119,56 @@ class Pokemon(commands.Cog):
     os.remove("item.png")
 
 
-  async def ptype(self, pokemon):
-    pokem = pypokedex.get(name=pokemon)
-    ptype = ""
-    pokem.types = [typ.capitalize() for typ in pokem.types]
-    for typ in pokem.types:
-      ptype += f'{typ} '
-    return ptype
+  @commands.command()
+  async def pdata(self, ctx, pokemon):
+        """
+        Pokemon Detailed Info
+        """
+        if not any(map(str.isdigit, pokemon)):
+          pokemon = await self.pknamecheck(pokemon)
+        pkid = pykemon.get_pokemon(pokemon).name
+        pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
+        stat = pykemon.get_pokemon(pokemon)
+        embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
+        embed.set_image(url = pimg)
+        embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
+        embed.add_field(name = "Type", value = await self.ptype(pokemon, "data"))
+        embed.add_field(name = "Abilities", value = await self.pability(pokemon))
+        embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
+        embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
+        embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
+        embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
+        embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
+        embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
+        await ctx.send(embed = embed)
 
+  async def pstat(self, pokemon):
+        pstat = pykemon.get_pokemon(pokemon)
+        data = [[str(pstat.stats[0].base_stat), str(pstat.stats[1].base_stat), str(pstat.stats[2].base_stat)], [str(pstat.stats[3].base_stat), str(pstat.stats[4].base_stat), str(pstat.stats[5].base_stat)]]
+        pkst =  "`{: >0} {: >12} {: >12}`\n".format("HP", "Atk", "Def")
+        row = data[0]
+        pkst = pkst + "`{: >0} {: >11} {: >12}`\n".format(*row)
+        pkst += "`{: >0} {: >11} {: >8}`\n".format("Sp. Atk", "Sp. Def", "Spe")
+        row = data[1]
+        pkst = pkst + "`{: >0} {: >11} {: >12}`\n".format(*row)
+        return pkst
+
+  async def ptype(self, pokemon, ptyp = "urmom"):
+    if ptyp == "data":
+        pokem = pypokedex.get(name=pokemon)
+        ptype = ""
+        pokem.types = [typ.capitalize() for typ in pokem.types]
+        for typ in pokem.types:
+          icon = await self.typeicon(typ)
+          ptype += f'{icon} {typ}\n'
+    else: 
+        pokem = pypokedex.get(name=pokemon)
+        ptype = ""
+        pokem.types = [typ.capitalize() for typ in pokem.types]
+        for typ in pokem.types:
+          icon = await self.typeicon(typ)
+          ptype += f'{icon} {typ} '
+    return ptype
 
 
   async def pokename(self, pokemon):
@@ -138,6 +180,14 @@ class Pokemon(commands.Cog):
         name = pk.capitalize()
     return name
 
+  async def pdatadesc(self, pokemon):
+        pdesc = "__**#"
+        pdesc += str(pykemon.get_pokemon(pokemon).id)
+        pdesc += " | "
+        pdesc += str(pykemon.get_pokemon_species(pokemon).generation.name.upper())
+        pdesc += "**__"
+        pdesc = pdesc.replace('GENERATION-', 'Generation ')
+        return pdesc
 
   async def pspecies(self, pokemon):
     pk = pykemon.get_pokemon_species(pokemon)
@@ -311,9 +361,128 @@ class Pokemon(commands.Cog):
     pkm = pkm['results']
     for name in pkm:
         lst.append(name['name'])
-    checkitem = difflib.get_close_matches(pokemon, lst)
-    checkitem = checkitem[0]
-    return checkitem
+    checkpk = difflib.get_close_matches(pokemon, lst)
+    checkpk = checkpk[0]
+    return checkpk
+
+  async def pability(self, pokemon):
+    pklink = f'https://pokeapi.co/api/v2/pokemon/{pokemon}'
+    abilities = requests.get(pklink)
+    abs = abilities.json()
+    abs = abs['abilities']
+    pkab = ""
+    x = 1
+    y = 0
+    for ability in abs:
+      if ability['is_hidden'] == False:
+        y += 1
+        pkab += str(ability['ability']['name']).title()
+        pkab = pkab.replace("-", " ")
+        if x == 1:
+          pkab += "/"
+          x += 1
+      else: 
+        pkab += "\n"
+        pkab += str(ability['ability']['name']).title()
+        pkab = pkab.replace("-", " ")
+    if y == 1:
+        pkab = pkab.replace("/", "")
+    return pkab
+
+  async def typeicon(self, type):
+    if type == 'Water':
+        return "<:water_type:847958750400217098>"
+    elif type == 'Steel':
+        return "<:steel_type:847958750383439882>"
+    elif type == 'Rock':
+        return "<:rock_type:847958750307942400>"
+    elif type == 'Psychic':
+        return "<:psychic_type:847958750350671932>"
+    elif type == 'Poison':
+        return "<:poison_type:847958750383571024>"
+    elif type == 'Normal':
+        return "<:normal_type:847958750294966283>"
+    elif type == 'Ice':
+        return "<:ice_type:847958750228774932>"
+    elif type == 'Ground':
+        return "<:ground_type:847958750231920647>"
+    elif type == 'Grass':
+        return "<:grass_type:847958750341234718>"
+    elif type == 'Ghost':
+        return "<:ghost_type:847958750321049620>"
+    elif type == 'Flying':
+        return "<:flying_type:847958750249222174>"
+    elif type == 'Fire':
+        return "<:fire_type:847958750072930325>"
+    elif type == 'Fighting':
+        return "<:fighting_type:847958750245683200>"
+    elif type == 'Electric':
+        return "<:electric_type:847958750207541310>"
+    elif type == 'Dragon':
+        return "<:dragon_type:847958750123655188>"
+    elif type == 'Bug':
+        return "<:bug_type:847958749679583252>"
+    elif type == 'Fairy':
+        return "<:fairy_type:847958750253285436>"
+    elif type == 'Dark':
+        return "<:dark_type:847958749862821888>"
+    
+  async def pev(self, pokemon):
+    stats = pykemon.get_pokemon(pokemon).stats
+    x = 1
+    for effort in stats:
+        if str(effort) != "<Pokemon_Stat | 0>":
+            for c in str(effort):
+                if c.isdigit():
+                   return f'{c} {await self.statname(x)}'
+        else:
+            x += 1
+
+  async def statname(self, stat):
+      if stat == 1:
+          return 'HP'
+      elif stat == 2:
+          return 'Atk'
+      elif stat == 3:
+          return 'Def'
+      elif stat == 4:
+          return 'Sp. Atk'
+      elif stat == 5:
+          return 'Sp. Def'
+      elif stat == 6:
+          return 'Spe'
+
+  async def gcr(self, pokemon):
+    gcr = pykemon.get_pokemon_species(pokemon)
+    growth = gcr.growth_rate.name.title() + "/"
+    capturerate = str(gcr.capture_rate)
+    growth = growth.replace("-", " ")
+    return growth + capturerate
+
+  async def gender(self, pokemon):
+    gender = pykemon.get_pokemon_species(pokemon).gender_rate
+    if gender == -1:
+        return "Genderless"
+    else: 
+        return str(gender) + "/8 ♀️"
+
+  async def egggroup(self, pokemon):
+    egggroup = pykemon.get_pokemon_species(pokemon)
+    egroup = ""
+    x = 0
+    for group in egggroup.egg_groups:
+       egroup += str(group.name).title()
+       if x == 0:
+           egroup += "/"
+           x += 1
+    if egroup[-1] == "/":
+        egroup = egroup[:-1]
+    egroup = egroup.replace("-", " ")
+    return egroup
+
+  async def hatchtime(self, pokemon):
+    hatch = pykemon.get_pokemon_species(pokemon).hatch_counter
+    return str(255 * (hatch + 1)) + " Steps"
 
 def setup(bot):
 	bot.add_cog(Pokemon(bot))
