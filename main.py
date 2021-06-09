@@ -27,7 +27,7 @@ bot.remove_command('help')
 async def presence():
     act = random.randint(1, 4)
     if act == 1:
-      dact = bot.change_presence(activity=discord.Game(name="BMO"))
+      dact = bot.change_presence(status = discord.Status.idle, activity=discord.Game(name="BMO"))
     elif act == 2:
       dact = bot.change_presence(activity=discord.Streaming(name="Pirates of the Enchiridion", url="https://www.twitch.tv/0jmaster"))
     elif act == 3:
