@@ -1,49 +1,147 @@
 import discord
 from discord.ext import commands
-from mojang import MojangAPI
-import requests, json
 
+# This prevents staff members from being punished 
+class Sinner(commands.Converter):
+    async def convert(self, ctx, argument):
+        argument = await commands.MemberConverter().convert(ctx, argument) # gets a member object
+        permission = argument.guild_permissions.manage_messages # can change into any permission
+        if not permission: # checks if user has the permission
+            return argument # returns user object
+        else:
+            raise commands.BadArgument("You cannot punish other staff members") # tells user that target is a staff member
 
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='!', intents=intents)
-client = discord.Client()
+# Checks if you have a muted role
+class Redeemed(commands.Converter):
+    async def convert(self, ctx, argument):
+        argument = await commands.MemberConverter().convert(ctx, argument) # gets member object
+        muted = discord.utils.get(ctx.guild.roles, name="Muted") # gets role object
+        if muted in argument.roles: # checks if user has muted role
+            return argument # returns member object if there is muted role
+        else:
+            raise commands.BadArgument("The user was not muted.") # self-explainatory
+            
+# Checks if there is a muted role on the server and creates one if there isn't
+async def mute(ctx, user, reason):
+    role = discord.utils.get(ctx.guild.roles, name="Muted") # retrieves muted role returns none if there isn't 
+    hell = discord.utils.get(ctx.guild.text_channels, name="muted") # retrieves channel named muted returns none if there isn't
+    if not role: # checks if there is muted role
+        try: # creates muted role 
+            muted = await ctx.guild.create_role(name="Muted", reason="To use for muting")
+            for channel in ctx.guild.channels: # removes permission to view and send in the channels 
+                await channel.set_permissions(muted, send_messages=False,
+                                              read_message_history=False,
+                                              read_messages=False)
+        except discord.Forbidden:
+            return await ctx.send("I have no permissions to make a muted role") # self-explainatory
+        await user.add_roles(muted) # adds newly created muted role
+        await ctx.send(f"{user.mention} has been muted for {reason}")
+    else:
+        await user.add_roles(role) # adds already existing muted role
+        await ctx.send(f"{user.mention} has been muted for {reason}")
+       
+    if not hell: # checks if there is a channel named muted
+        overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(read_message_history=False),
+                      ctx.guild.me: discord.PermissionOverwrite(send_messages=True),
+                      muted: discord.PermissionOverwrite(read_message_history=True)} # permissions for the channel
+        try: # creates the channel and sends a message
+            channel = await ctx.create_channel('muted', overwrites=overwrites)
+            await channel.send("You will spend your time here until you get unmuted. Enjoy the silence.")
+        except discord.Forbidden:
+            return await ctx.send("I have no permissions to make #muted")
+            
+            
+class Moderation(commands.Cog):
+    """
+    Commands used to moderate your guild
+    """
+    
+    def __init__(self, bot):
+        self.bot = bot
+    
+    async def __error(self, ctx, error):
+        if isinstance(error, commands.BadArgument):
+            await ctx.send(error)
+            
+    @commands.command()
+    @commands.has_permissions(ban_members=True)
+    async def ban(self, ctx, user: Sinner=None, reason=None):
+        """Bans specified user"""
+        
+        if not user: # checks if there is a user
+            return await ctx.send("You must specify a user")
+        
+        try: # Tries to ban user
+            await ctx.guild.ban(user, f"By {ctx.author} for {reason}" or f"By {ctx.author} for None Specified")
+            await ctx.send(f"{user.mention} was banned for {reason}.")
+        except discord.Forbidden:
+            return await ctx.send("Are you trying to ban someone higher than the bot")
 
-class Minecraft(commands.Cog):
-  """
-  Search up a minecraft player!
-  """
-	  
-  def __init__(self, bot):
-    self.bot = bot
+    @commands.command()
+    async def softban(self, ctx, user: Sinner=None, reason=None):
+        """Temporarily bans a member"""
+        
+        if not user: # checks if there is a user
+            return await ctx.send("You must specify a user")
+        
+        try: # Tries to soft-ban user
+            await ctx.guild.ban(user, f"By {ctx.author} for {reason}" or f"By {ctx.author} for None Specified") 
+            await ctx.guild.unban(user, "Temporarily Banned")
+        except discord.Forbidden:
+            return await ctx.send("Are you trying to soft-ban someone higher than the bot?")
+    
+    @commands.command()
+    async def mute(self, ctx, user: Sinner, reason=None):
+        """Mutes user"""
+        await mute(ctx, user, reason or "treason") # uses the mute function
+    
+    @commands.command()
+    async def kick(self, ctx, user: Sinner=None, reason=None):
+        """Kicks a user"""
+        if not user: # checks if there is a user 
+            return await ctx.send("You must specify a user")
+        
+        try: # tries to kick user
+            await ctx.guild.kick(user, f"By {ctx.author} for {reason}" or f"By {ctx.author} for None Specified") 
+        except discord.Forbidden:
+            return await ctx.send("Are you trying to kick someone higher than the bot?")
 
+    @commands.command()
+    async def purge(self, ctx, limit: int):
+        """Bulk deletes messages"""
+        
+        await ctx.purge(limit=limit + 1) # also deletes your own message
+        await ctx.send(f"Bulk deleted `{limit}` messages") 
+    
+    @commands.command()
+    async def unmute(self, ctx, user: Redeemed):
+        """Unmutes a muted user"""
+        await user.remove_roles(discord.utils.get(ctx.guild.roles, name="Muted")) # removes muted role
+        await ctx.send(f"{user.mention} has been unmuted")
 
-  @commands.command(aliases = ["mc"])
-  async def mcprofile(self, ctx, player):
-      uuid = MojangAPI.get_uuid(player)
-      if not uuid:
-          await ctx.send(f'{player} does not exist.')
-      else:
-          profile = MojangAPI.get_profile(uuid)
-          embed = discord.Embed(title = "UUID", description = f'`{uuid}`', color = discord.Color.dark_green())
-          embed.set_author(name = profile.name, url = 'https://images-ext-1.discordapp.net/external/ha2UA0g2Fsh0wn67g6bU49JA1YOJFqyn2LgPvDS2W2w/https/orig00.deviantart.net/34de/f/2012/204/b/c/grass_block_by_barakaldo-d58bi3u.gif')
-          embed.set_thumbnail(url = f'https://visage.surgeplay.com/full/512/{uuid}')
-          mcskin = profile.skin_url
-          embed.add_field(name = "Textures", value = f"[MC Skin]({mcskin})")
-          embed.add_field(name = 'Skin Type', value = profile.skin_model.capitalize())
-          embed.add_field(name = "Username History", value = await self.namehistory(uuid), inline = False)
-          await ctx.send(embed = embed)
-  
-  async def namehistory(self, player):
-      name_history = MojangAPI.get_name_history(player)
-      npf = MojangAPI.get_profile(player)
-      names = []
-      nm = ""
-      x = 0
-      for data in name_history:
-          names.append("`" + data['name'] + "`")
-      names = "\n".join(names)
-      return names
-
+    @commands.command()
+    async def block(self, ctx, user: Sinner=None):
+        """
+        Blocks a user from chatting in current channel.
+           
+        Similar to mute but instead of restricting access
+        to all channels it restricts in current channel.
+        """
+                                
+        if not user: # checks if there is user
+            return await ctx.send("You must specify a user")
+                                
+        await ctx.set_permissions(user, send_messages=False) # sets permissions for current channel
+    
+    @commands.command()
+    async def unblock(self, ctx, user: Sinner=None):
+        """Unblocks a user from current channel"""
+                                
+        if not user: # checks if there is user
+            return await ctx.send("You must specify a user")
+        
+        await ctx.set_permissions(user, send_messages=True) # gives back send messages permissions
+                                
+                                
 def setup(bot):
-	bot.add_cog(Minecraft(bot))
-
+    bot.add_cog(Moderation(bot))
