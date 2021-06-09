@@ -4,7 +4,7 @@ import random
 from urbandictionary_top import udtop
 import  aiohttp
 import asyncio
-import json, asyncpraw
+import json
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -98,13 +98,42 @@ class Fun(commands.Cog):
   @commands.command(aliases=['cat', 'randomcat'])
   async def neko(self, ctx):
       '''NEEKO NEEKO NEEE'''
-      reddit = asyncpraw.Reddit(client_id='ywFPprh9AzkjrA', client_secret = 'Y49u2M2O6hLtPbUF060F2lyzXVZezg', user_agent = 'Jake the Dog')
-      submission = await reddit.subreddit("catpics")
-      submission = await submission.random()
-      embed = discord.Embed(title = submission.title, color = discord.Color.red(), url = submission.shortlink)
-      embed.set_image(url = submission.url)
-      await ctx.send(embed = embed)
-      await reddit.close()
+      #http://discordpy.readthedocs.io/en/latest/faq.html#what-does-blocking-mean
+      async with aiohttp.ClientSession() as cs:
+          async with cs.get('http://aws.random.cat/meow') as r:
+              res = await r.json()
+              emojis = [':cat2: ', ':cat: ', ':heart_eyes_cat: ']
+              await ctx.send(random.choice(emojis) + res['file'])
+
+
+  @commands.command(aliases=['rand'])
+  async def random(self, ctx, *arg):
+      '''Returns a random number or member'''
+      if ctx.invoked_subcommand is None:
+          if not arg:
+              start = 1
+              end = 100
+          elif arg[0] == 'choice':
+              choices = list(arg)
+              choices.pop(0)
+              await ctx.send(f':congratulations: The winner is {random.choice(choices)}')
+              return
+          elif arg[0] == 'user':
+              online = self.userOnline(ctx.guild.members)
+              randomuser = random.choice(online)
+              if ctx.channel.permissions_for(ctx.author).mention_everyone:
+                  user = randomuser.mention
+              else:
+                  user = randomuser.display_name
+              await ctx.send(f':congratulations: The winner is {user}')
+              return
+          elif len(arg) == 1:
+              start = 1
+              end = int(arg[0])
+          elif len(arg) == 2:
+              start = int(arg[0])
+              end = int(arg[1])
+          await ctx.send(f'**:arrows_counterclockwise:** Random number ({start} - {end}): {random.randint(start, end)}')
 
   @commands.command()
   async def rip(self, ctx, member:str):

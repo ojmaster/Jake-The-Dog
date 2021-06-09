@@ -156,7 +156,7 @@ async def servers(ctx):
   embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
   for guild in bot.guilds:
     embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}', inline = True)
-  await ctx.send(embed = embed)
+  await ctx.reply(embed = embed)
 
 
 @bot.command(name="reload",
@@ -166,24 +166,24 @@ async def reload(ctx, extension):
   if ctx.author == bot.appinfo.owner:
     bot.unload_extension(f'cogs.{extension}')
     bot.load_extension(f'cogs.{extension}')
-    await ctx.send(f'Extension "{extension}" reloaded!')
+    await ctx.reply(f'Extension "{extension}" reloaded!')
   else:
-    ctx.send("Insufficient Permissions")
+    ctx.reply("Insufficient Permissions")
 
 @bot.command(name="load", description = "Loads extension", hidden = True)
 async def load(ctx, extension):
   if ctx.author == bot.appinfo.owner:
     bot.load_extension(f'cogs.{extension}')
-    await ctx.send(f'Extension "{extension}" loaded')
+    await ctx.reply(f'Extension "{extension}" loaded')
   else:
-    ctx.send("Insufficient Permissions")
+    ctx.reply("Insufficient Permissions")
 
 @bot.command(name= "unload", description = "Unloads extension", hidden = True)
 async def unload(ctx, extension):
   if ctx.author == bot.appinfo.owner:
     bot.unload_extension(f'cogs.{extension}')
-    await ctx.send(f'Extension "{extension}" unloaded')
+    await ctx.reply(f'Extension "{extension}" unloaded')
   else:
-    ctx.send("Insufficient Permissions")
+    ctx.reply("Insufficient Permissions")
 
 bot.run(config('TOKEN'))
