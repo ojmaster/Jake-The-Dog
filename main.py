@@ -12,9 +12,9 @@ Token = config('TOKEN')
 
 def get_prefix(bot, message):
     with open('prefixes.json', 'r') as pr:
-        prefixes = json.load(pr) 
+        prefixes = json.load(pr)
     if not message.guild:
-      return commands.when_mentioned_or(",")(bot, message)
+      return commands.when_mentioned_or("!")(bot, message)
     return prefixes[str(message.guild.id)]
 
 
