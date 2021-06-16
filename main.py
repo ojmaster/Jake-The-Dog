@@ -73,19 +73,20 @@ async def on_guild_join(guild):
         json.dump(prefixes, pr, indent=4)
     bs = False
     for channel in guild.channels:
-        if "chat" in channel.name or "staff" in channel.name:
-            time.sleep(0.1)
-            embed = discord.Embed(title="**Jake the Dog**",
-                                  description="Heyo!",
-                                  color=discord.Color.purple())
-            embed.add_field(
-                name="My default prefix is '!''",
-                value="You can change my prefix with the !setprefix",
-                inline=False)
-            await channel.send(embed=embed)
-            inv = await channel.create_invite()
-            bs = True
-            break
+        if channel.type is discord.ChannelType.text:
+            if "chat" in channel.name or "staff" in channel.name:
+                time.sleep(0.1)
+                embed = discord.Embed(title="**Jake the Dog**",
+                                      description="Heyo!",
+                                      color=discord.Color.purple())
+                embed.add_field(
+                    name="My default prefix is '!''",
+                    value="You can change my prefix with the !setprefix",
+                    inline=False)
+                await channel.send(embed=embed)
+                inv = await channel.create_invite()
+                bs = True
+                break
     if bs == False:
         for channel in guild.channels:
             if channel.type is discord.ChannelType.text:
