@@ -16,6 +16,7 @@ class NSFW(commands.Cog):
     self.bot = bot
 
   @commands.command()
+  @commands.is_nsfw()
   async def kim(self, ctx):
     """Hentai"""
     reddit = asyncpraw.Reddit(client_id='ywFPprh9AzkjrA', client_secret = 'Y49u2M2O6hLtPbUF060F2lyzXVZezg', user_agent = 'Jake the Dog')
@@ -25,6 +26,13 @@ class NSFW(commands.Cog):
     embed.set_image(url = submission.url)
     await ctx.send(embed = embed)
     await reddit.close()
+
+  @commands.Cog.listener()
+  async def on_command_error(self, ctx, error):
+    if isinstance(error, commands.errors.NSFWChannelRequired):
+       msg.title = "NSFW Command"
+       msg.description = error.args[0]
+       return await ctx.send(embed=msg)
 
 def setup(bot):
 	bot.add_cog(NSFW(bot))
