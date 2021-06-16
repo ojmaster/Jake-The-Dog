@@ -150,14 +150,17 @@ for filename in os.listdir('./cogs'):
 bot.unload_extension('cogs.Owner')
 
 
-@bot.command(name = "servers", 
+@bot.command(name = "serverlist", 
             description = "All servers bot is in", 
             hidden = True)
 async def servers(ctx):
-  embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
-  for guild in bot.guilds:
-    embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}', inline = True)
-  await ctx.reply(embed = embed)
+  if ctx.author == bot.appinfo.owner:
+      embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
+      for guild in bot.guilds:
+        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}', inline = True)
+      await ctx.reply(embed = embed)
+  else:
+    ctx.reply("Insufficient Permissions")
 
 
 @bot.command(name="reload",
