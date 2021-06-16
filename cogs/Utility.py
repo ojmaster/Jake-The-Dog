@@ -69,10 +69,9 @@ class Utility(commands.Cog):
   async def updates(self, ctx):
     """See all recent updates to the bot!"""
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Pokemon", value="New `pdata` command!\nGet detailed info on the pokemon of your choosing!", inline=True)
-    embed.set_footer(text="v1.1")
-    channel = self.bot.get_channel(838724759499702312)
-    await channel.send(embed=embed)
+    embed.add_field(name="Minecraft", value="`mcserver` command, lets you get information about a minecraft server!", inline=True)
+    embed.set_footer(text="v1.7")
+    await ctx.send(embed=embed)
 
 
 def setup(bot):

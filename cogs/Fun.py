@@ -65,6 +65,9 @@ class Fun(commands.Cog):
 
   @commands.command()
   async def pick(self, ctx, *arg):
+    """
+    Pick from a list of choices
+    """
     choices = list(arg)
     choices.pop(0)
     await ctx.send(f'{random.choice(choices)}')

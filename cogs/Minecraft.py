@@ -11,7 +11,7 @@ client = discord.Client()
 
 class Minecraft(commands.Cog):
   """
-  Search up a minecraft player!
+  Minecraft searches!
   """
 	  
   def __init__(self, bot):
@@ -20,6 +20,10 @@ class Minecraft(commands.Cog):
 
   @commands.command(aliases = ["mcp"])
   async def mcprofile(self, ctx, player):
+      """
+      Search up a minecraft player!
+      Usage: mcp <username>
+      """
       uuid = MojangAPI.get_uuid(player)
       if not uuid:
           await ctx.send(f'{player} does not exist.')
@@ -48,7 +52,8 @@ class Minecraft(commands.Cog):
   @commands.command(aliases = ['mcs'])
   async def mcserver(self, ctx, ip, port = ''):
       """
-      Search up a server
+      Search up a minecraft server
+      Usage: mcs <ip> <port> (port optional)
       """
       try: 
           if port.isdigit():

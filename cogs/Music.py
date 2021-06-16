@@ -584,6 +584,9 @@ class Music(commands.Cog):
     @commands.command(name='play', aliases=['p'])
     async def _play(self, ctx: commands.Context, *, search: str):
         # Checks if song is on spotify and then searches.
+        """
+        Plays the linked youtube or spotify song
+        """
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
         if "https://open.spotify.com/playlist/" in search or "spotify:playlist:" in search:
