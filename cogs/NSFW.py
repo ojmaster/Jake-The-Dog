@@ -30,9 +30,8 @@ class NSFW(commands.Cog):
   @commands.Cog.listener()
   async def on_command_error(self, ctx, error):
     if isinstance(error, commands.errors.NSFWChannelRequired):
-       msg.title = "NSFW Command"
-       msg.description = error.args[0]
-       return await ctx.send(embed=msg)
+       embed = discord.Embed(title = "NSFW Command", description = error.args[0])
+       await ctx.send(embed=embed)
 
 def setup(bot):
 	bot.add_cog(NSFW(bot))
