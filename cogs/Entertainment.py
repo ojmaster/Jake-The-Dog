@@ -6,6 +6,9 @@ from discord_components import DiscordComponents, Button, ButtonStyle
 
 
 class Entertainment(commands.Cog):
+    """
+    Discord VC Games!!
+    """
     def __init__(self, bot):
         self.bot = bot
         self.dc = DiscordComponents(self.bot)
@@ -13,6 +16,9 @@ class Entertainment(commands.Cog):
 
     @commands.command()
     async def activities(self, ctx, hidden=False):
+        """
+        The base command for all VC games
+        """
         components = []
         for k, _i in self.known_activities.items():
             components.append(Button(style=ButtonStyle.blue, label=k))

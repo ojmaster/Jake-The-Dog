@@ -12,8 +12,8 @@ cffi==1.14.5
 chardet==4.0.0
 click==8.0.0
 colorama==0.4.4
-discord.py==1.7.2
-discord==1.0.1
+discord.py==1.7.3
+discord-components==0.5.3
 Flask==2.0.0
 html5lib==1.1
 idna==2.10
