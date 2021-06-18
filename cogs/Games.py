@@ -5,7 +5,7 @@ from discord.http import Route
 from discord_components import DiscordComponents, Button, ButtonStyle
 
 
-class Games(commands.Cog):
+class Entertainment(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.dc = DiscordComponents(self.bot)
