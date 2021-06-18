@@ -1,6 +1,7 @@
 import discord
 import time
 from discord.ext import commands, tasks
+from discord_components import DiscordComponents, Button
 import json
 from decouple import config
 import os
@@ -25,7 +26,7 @@ client = discord.Client()
 bot.remove_command('help')
 
 async def presence():
-    act = random.randint(1, 4)
+    act = random.randint(1, 5)
     if act == 1:
       dact = bot.change_presence(activity=discord.Game(name="BMO"))
     elif act == 2:
@@ -34,6 +35,8 @@ async def presence():
       dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="Island Song"))
     elif act == 4:
       dact = bot.change_presence(activity=discord.Activity(type=discord.ActivityType.watching, name="Distant Lands"))
+    elif act == 5:
+      dact = bot.change_presence(activity=discord.Activity(type=5,name="Card Wars"))
     dact = await dact
     return dact
 
