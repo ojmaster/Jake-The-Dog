@@ -70,7 +70,7 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
     embed.add_field(name="Entertainment", value="`activities` - An early beta Discord feature that allows you to play games with friends through a Discord server vc and watch Youtube videos together. \nNOTE: This only works on desktop versions as it has not been implemented in mobile", inline=True)
-    embed.set_footer(text="v1.8")
+    embed.set_footer(text="v1.0.8")
     await ctx.send(embed=embed)
 
 
