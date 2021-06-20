@@ -74,11 +74,10 @@ async def on_guild_join(guild):
     with open('prefixes.json', 'w') as pr:
         json.dump(prefixes, pr, indent=4)
     bs = False
-    global inv
     for channel in guild.channels:
         if channel.type is discord.ChannelType.text:
             if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
-                if channel.permissions_for(guild.me).send_messages:
+                if channel.permissions_for(guild.me).send_messages and channel.permissions_for(guild.me).create_invite:
                     time.sleep(0.1)
                     embed = discord.Embed(title="**Jake the Dog**",
                                           description="Heyo!",
@@ -94,7 +93,7 @@ async def on_guild_join(guild):
     if bs == False:
         for channel in guild.channels:
             if channel.type is discord.ChannelType.text:
-                if channel.permissions_for(guild.me).send_messages:
+                if channel.permissions_for(guild.me).send_messages and channel.permissions_for(guild.me).create_invite:
                     time.sleep(0.1)
                     embed = discord.Embed(title="**Jake the Dog**",
                                           description="Heyo!",
