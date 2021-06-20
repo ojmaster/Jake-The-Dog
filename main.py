@@ -74,6 +74,7 @@ async def on_guild_join(guild):
     with open('prefixes.json', 'w') as pr:
         json.dump(prefixes, pr, indent=4)
     bs = False
+    global inv
     for channel in guild.channels:
         if channel.type is discord.ChannelType.text:
             if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
