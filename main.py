@@ -86,10 +86,10 @@ async def on_guild_join(guild):
                         name="My default prefix is '>''",
                         value="You can change my prefix with the !setprefix",
                         inline=False)
-                await channel.send(embed=embed)
-                inv = await channel.create_invite()
-                bs = True
-                break
+                    await channel.send(embed=embed)
+                    inv = await channel.create_invite()
+                    bs = True
+                    break
     if bs == False:
         for channel in guild.channels:
             if channel.type is discord.ChannelType.text:
