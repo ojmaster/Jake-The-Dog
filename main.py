@@ -1,7 +1,6 @@
 import discord
 import time
 from discord.ext import commands, tasks
-from discord_components import DiscordComponents, Button
 import json
 from decouple import config
 import os
