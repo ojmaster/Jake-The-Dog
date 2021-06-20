@@ -2,13 +2,12 @@ import discord
 from discord.ext import commands
 import time
 import json
-from discord_components import Button, ButtonStyle, DiscordComponents
+from discord_components import  DiscordComponents, Button, ButtonStyle
 from discord.ext.commands import has_permissions
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
 client = discord.Client()
-DiscordComponents(bot)
 
 class Utility(commands.Cog):
   """
@@ -16,6 +15,7 @@ class Utility(commands.Cog):
   """
   def __init__(self, bot):
     self.bot = bot
+    DiscordComponents(bot)
 
   @commands.command()
   async def ping(self, ctx):
@@ -81,7 +81,12 @@ class Utility(commands.Cog):
       Sends the bot's invite link
       """
       embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
-      await ctx.send(embed = embed, component = [Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot")])
+      await ctx.send(embed = embed, components = [
+                [
+                Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot")
+                ]
+          ]
+      )
 
 
 def setup(bot):
