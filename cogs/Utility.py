@@ -73,6 +73,13 @@ class Utility(commands.Cog):
     embed.set_footer(text="v1.0.8")
     await ctx.send(embed=embed)
 
+  @commands.command()
+  async def invite(self, ctx):
+      """
+      Sends the bot's invite link
+      """
+      await ctx.send("https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot")
+
 
 def setup(bot):
 	bot.add_cog(Utility(bot))
