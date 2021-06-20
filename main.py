@@ -15,7 +15,7 @@ def get_prefix(bot, message):
     with open('prefixes.json', 'r') as pr:
         prefixes = json.load(pr)
     if not message.guild:
-      return commands.when_mentioned_or("!")(bot, message)
+      return commands.when_mentioned_or(">")(bot, message)
     return prefixes[str(message.guild.id)]
 
 
@@ -71,19 +71,19 @@ global count
 async def on_guild_join(guild):
     with open('prefixes.json', 'r') as pr:
         prefixes = json.load(pr)
-    prefixes[str(guild.id)] = '!'
+    prefixes[str(guild.id)] = '>'
     with open('prefixes.json', 'w') as pr:
         json.dump(prefixes, pr, indent=4)
     bs = False
     for channel in guild.channels:
         if channel.type is discord.ChannelType.text:
-            if "chat" in channel.name or "staff" in channel.name:
+            if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
                 time.sleep(0.1)
                 embed = discord.Embed(title="**Jake the Dog**",
                                       description="Heyo!",
                                       color=discord.Color.purple())
                 embed.add_field(
-                    name="My default prefix is '!''",
+                    name="My default prefix is '>''",
                     value="You can change my prefix with the !setprefix",
                     inline=False)
                 await channel.send(embed=embed)
@@ -93,17 +93,18 @@ async def on_guild_join(guild):
     if bs == False:
         for channel in guild.channels:
             if channel.type is discord.ChannelType.text:
-                time.sleep(0.1)
-                embed = discord.Embed(title="**Jake the Dog**",
-                                      description="Heyo!",
-                                      color=discord.Color.purple())
-                embed.add_field(
-                    name="My default prefix is '!''",
-                    value="You can change my prefix with the !setprefix",
-                    inline=False)
-                await channel.send(embed=embed)
-                inv = await channel.create_invite()
-                break
+                if channel.permissions_for(guild.me).send_messages:
+                    time.sleep(0.1)
+                    embed = discord.Embed(title="**Jake the Dog**",
+                                          description="Heyo!",
+                                          color=discord.Color.purple())
+                    embed.add_field(
+                        name="My default prefix is '>''",
+                        value="You can change my prefix with the !setprefix",
+                        inline=False)
+                    await channel.send(embed=embed)
+                    inv = await channel.create_invite()
+                    break
     global count
     count = 0
     for member in guild.members:
