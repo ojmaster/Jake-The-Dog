@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import time
 import json
-from discord_components import  DiscordComponents, Button, ButtonStyle
+from discord_components import  Button, ButtonStyle
 from discord.ext.commands import has_permissions
 
 intents = discord.Intents.all()
@@ -15,7 +15,7 @@ class Utility(commands.Cog):
   """
   def __init__(self, bot):
     self.bot = bot
-    DiscordComponents(bot)
+
 
   @commands.command()
   async def ping(self, ctx):

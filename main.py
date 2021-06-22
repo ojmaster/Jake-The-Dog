@@ -1,6 +1,7 @@
 import discord
 import time
 from discord.ext import commands, tasks
+from discord_components import  DiscordComponents, Button, ButtonStyle
 import json
 from decouple import config
 import os
@@ -52,6 +53,7 @@ async def on_ready():
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
     await client.login(config('TOKEN'))
+    DiscordComponents(bot)
     change_stat.start()
 
 @tasks.loop(hours = 3)

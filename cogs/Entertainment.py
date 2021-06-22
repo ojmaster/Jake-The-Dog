@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from discord.http import Route
 from discord_components import DiscordComponents, Button, ButtonStyle
+import asyncio
 
 
 class Entertainment(commands.Cog):
@@ -54,13 +55,14 @@ class Entertainment(commands.Cog):
                 return await res.respond(
                     content="I Need the `Create Invite` permission.", type=7
                 )
-
+            
             await res.respond(
                 embed=discord.Embed(
                     description=f"[Click here!](https://discord.gg/{code})\nLink expires in 1 minute",
                     color=discord.Colour.red(),
                 ),
-                type=7,
+                type=4, 
+                ephemeral = False
             )
 
 
