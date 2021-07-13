@@ -155,7 +155,6 @@ for filename in os.listdir('./cogs'):
         bot.load_extension(f'cogs.{filename[:-3]}')
         print(f'cogs.{filename[:-3]}')
 bot.unload_extension('cogs.Owner')
-bot.unload_extension('cogs.NSFW')
 
 @bot.command(name = "serverlist", 
             description = "All servers bot is in", 
