@@ -26,17 +26,17 @@ class Owner(commands.Cog):
     if ctx.author == self.bot.appinfo.owner:
       embed = discord.Embed(title = "What would you like to change the presence to?", color = discord.Color.gold())
       embed.add_field(name = "Watching", value = ":one:", inline = True)
-      embed.add_field(name = "⠀", value = "⠀")
       embed.add_field(name = "Listening", value = ":two:", inline = True)
       embed.add_field(name = "Streaming", value = ":three:", inline = True)
-      embed.add_field(name = "⠀", value = "⠀")
       embed.add_field(name = "Playing", value = ":four:", inline = True)
+      embed.add_field(name = "Competing", value = ":five:")
       components = [
                     [
                       Button(style = ButtonStyle.gray, label = "Watching"), 
                       Button(style = ButtonStyle.green, label = "Listening"),
                       Button(style = ButtonStyle.blue, label = "Streaming"),
-                      Button(style = ButtonStyle.red, label = "Playing")
+                      Button(style = ButtonStyle.red, label = "Playing"),
+                      Button(style = ButtonStyle.gray, label = "Competing")
                     ]
                   ]
       msg = await ctx.send(embed = embed, components = components)
@@ -93,6 +93,16 @@ class Owner(commands.Cog):
           play = discord.Embed(title = f'Playing {presence}', color = discord.Color.dark_green())
           await msg.delete()
           await ctx.send(embed = play) 
+        elif res.component.label == 'Competing':
+          compete = discord.Embed(title = "What am I competing in?", color = discord.Color.orange())
+          await msg.delete()
+          msg = await ctx.send(embed = compete)
+          presence = await self.bot.wait_for('message')
+          presence = (presence.content)
+          await self.bot.change_presence(activity=discord.Activity(type=5,name=presence))
+          compete = discord.Embed(title = f'Competing in {presence}', color = discord.Color.orange())
+          await msg.delete()
+          await ctx.send(embed = compete) 
 
       except asyncio.TimeoutError:
         embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
