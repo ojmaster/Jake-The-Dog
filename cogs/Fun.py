@@ -160,27 +160,13 @@ class Fun(commands.Cog):
 
   @commands.command(aliases=['joke'])
   async def pun(self, ctx):
-      '''Because everybody likes bad jokes'''
-      puns = ['How do you throw a space party? \nYou planet.',
-              'I would avoid the sushi if I was you. \nIt’s a little fishy.',
-              'Want to hear a joke about paper? \nNevermind it’s tearable.',
-              'Did you hear about the guy who lost the left side of his body? \nHe\'s alright now.',
-              'My cat was just sick on the carpet, \nI don’t think it’s feline well.',
-              'Towels can’t tell jokes. \nThey have a dry sense of humor.',
-              'To write with a broken pencil is pointless.',
-              'I went to a seafood disco last week... and pulled a mussel.',
-              'What do beavers like to put on their salads? \nBranch dressing.',
-              'How did the farmer find his wife? \nHe tractor down.',
-              'Why are ambulance drivers called paramedics? \nBecause that\'s what they are, a pair-of-medics.',
-              'A friend of mine runs a funeral home.\nPeople are dying to go there.',
-              'My friend Tony asked me not to say his name backwards.\nI said, "Y not?"',
-              'To the person who stole my MS Office License.\nI will find you. You have my Word.',
-              'What’s brown and sticky? \nA stick.',
-              'How do celebrities stay cool? \nThey have many fans.']
-      emojis = ['😆', '😄', '😂', '😭', '🤣']
-      msg = f'{random.choice(puns)}'
-      pn = await ctx.send(msg)
-      await pn.add_reaction(random.choice(emojis))
+    '''Because everybody likes bad jokes'''
+    data = json.load(open('./config/pun.json', encoding = "utf8", errors = 'ignore'))
+    emojis = ['😆', '😄', '😂', '😭', '🤣']
+    puns = [v for d in data['pun'] for k, v in d.items()]
+    msg = f'{random.choice(puns)}'
+    pn = await ctx.send(msg)
+    await pn.add_reaction(random.choice(emojis))
 
   @commands.command()
   async def tord(self, ctx):
@@ -199,13 +185,13 @@ class Fun(commands.Cog):
       reaction, user = await self.bot.wait_for('reaction_add', timeout = 7, check = check)
       if reaction.emoji == "🇹":
           await msg.delete()
-          data = json.load(open('./cogs/TruthOrDare/truth.json', encoding = "utf8", errors = 'ignore'))
+          data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['truth'] for k, v in d.items()]
           truthem = discord.Embed(title = "Truth", description = random.choice(values), color = discord.Color.green())
           await ctx.send(embed = truthem)
       if reaction.emoji == "🇩":
           await msg.delete()
-          data = json.load(open('./cogs/TruthOrDare/dare.json', encoding = "utf8", errors = 'ignore'))
+          data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['dare'] for k, v in d.items()]
           dareem = discord.Embed(title = "Dare", description = random.choice(values), color = discord.Color.dark_magenta())
           await ctx.send(embed = dareem)
