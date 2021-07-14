@@ -1,6 +1,8 @@
 import discord
 from discord.ext import commands
+from discord_components import DiscordComponents, Button, ButtonStyle
 import asyncio
+
 import time
 
 intents = discord.Intents.all()
@@ -19,7 +21,9 @@ class Owner(commands.Cog):
     """
     Change Bot Presence
     """
-    if ctx.author == self.bot.appinfo.owner or ctx.author.id == 534232070487146517:
+    # Check if user is bot owner
+    # Send list embed if true
+    if ctx.author == self.bot.appinfo.owner:
       embed = discord.Embed(title = "What would you like to change the presence to?", color = discord.Color.gold())
       embed.add_field(name = "Watching", value = ":one:", inline = True)
       embed.add_field(name = "⠀", value = "⠀")
@@ -27,18 +31,24 @@ class Owner(commands.Cog):
       embed.add_field(name = "Streaming", value = ":three:", inline = True)
       embed.add_field(name = "⠀", value = "⠀")
       embed.add_field(name = "Playing", value = ":four:", inline = True)
-      msg = await ctx.send(embed = embed)
-      await msg.add_reaction("1️⃣")
-      await msg.add_reaction("2️⃣")
-      await msg.add_reaction("3️⃣")
-      await msg.add_reaction("4️⃣")
+      components = [
+                    [
+                      Button(style = ButtonStyle.gray, label = "Watching"), 
+                      Button(style = ButtonStyle.green, label = "Listening"),
+                      Button(style = ButtonStyle.blue, label = "Streaming"),
+                      Button(style = ButtonStyle.red, label = "Playing")
+                    ]
+                  ]
+      msg = await ctx.send(embed = embed, components = components)
 
-      def check(reaction, user):
-        return user == ctx.message.author and str(reaction.emoji) in ['1️⃣', '2️⃣', '3️⃣', '4️⃣']
+      # Basic check for user
+      def check(res):
+          return ctx.author == res.user and res.channel == ctx.channel
 
+      # Responses
       try: 
-        reaction, user = await self.bot.wait_for('reaction_add', timeout = 7, check = check)
-        if reaction.emoji == '1️⃣':
+        res = await self.bot.wait_for('button_click', timeout = 7, check = check)
+        if res.component.label == 'Watching':
           watch = discord.Embed(title = "What am I watching?", color = discord.Color.dark_red())
           await msg.delete()
           msg = await ctx.send(embed = watch)
@@ -48,7 +58,7 @@ class Owner(commands.Cog):
           watch = discord.Embed(title = f'Watching {presence}', color = discord.Color.red())
           await msg.delete()
           await ctx.send(embed = watch) 
-        elif reaction.emoji == '2️⃣':
+        elif res.component.label == 'Listening':
           listen = discord.Embed(title = "What am I listening to?", color = discord.Color.dark_green())
           await msg.delete()
           msg = await ctx.send(embed = listen)
@@ -58,7 +68,7 @@ class Owner(commands.Cog):
           listen = discord.Embed(title = f'Listening to {presence}', color = discord.Color.dark_green())
           await msg.delete()
           await ctx.send(embed = listen) 
-        elif reaction.emoji == '3️⃣':
+        elif res.component.label == 'Streaming':
           stream = discord.Embed(title = "What is the title of the stream?", color = discord.Color.dark_purple())
           await msg.delete()
           msg = await ctx.send(embed = stream)
@@ -73,7 +83,7 @@ class Owner(commands.Cog):
           await msg.delete()
           await self.bot.change_presence(activity=discord.Streaming(name=presence, url=slink))
           await ctx.send(embed = stream)
-        elif reaction.emoji == '4️⃣':
+        elif res.component.label == 'Playing':
           play = discord.Embed(title = "What am I playing?", color = discord.Color.dark_blue())
           await msg.delete()
           msg = await ctx.send(embed = play)

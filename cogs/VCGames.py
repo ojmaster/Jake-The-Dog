@@ -6,7 +6,7 @@ from discord_components import DiscordComponents, Button, ButtonStyle
 import asyncio
 
 
-class Entertainment(commands.Cog):
+class VCGames(commands.Cog):
     """
     Discord VC Games!!
     """
@@ -67,4 +67,4 @@ class Entertainment(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Entertainment(bot))
+    bot.add_cog(VCGames(bot))
