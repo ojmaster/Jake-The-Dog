@@ -30,8 +30,9 @@ class Minecraft(commands.Cog):
       else:
           profile = MojangAPI.get_profile(uuid)
           embed = discord.Embed(title = "UUID", description = f'`{uuid}`', color = discord.Color.dark_green())
-          embed.set_author(name = profile.name, url = 'https://images-ext-1.discordapp.net/external/ha2UA0g2Fsh0wn67g6bU49JA1YOJFqyn2LgPvDS2W2w/https/orig00.deviantart.net/34de/f/2012/204/b/c/grass_block_by_barakaldo-d58bi3u.gif')
-          embed.set_thumbnail(url = f'https://visage.surgeplay.com/full/512/{uuid}')
+          embed.set_author(name = profile.name, icon_url = 'https://images-ext-1.discordapp.net/external/ha2UA0g2Fsh0wn67g6bU49JA1YOJFqyn2LgPvDS2W2w/https/orig00.deviantart.net/34de/f/2012/204/b/c/grass_block_by_barakaldo-d58bi3u.gif')
+          mcfull = f'https://crafatar.com/avatars/{uuid}?overlay=true'
+          embed.set_thumbnail(url = mcfull)
           mcskin = profile.skin_url
           embed.add_field(name = "Textures", value = f"[MC Skin]({mcskin})")
           embed.add_field(name = 'Skin Type', value = profile.skin_model.capitalize())
