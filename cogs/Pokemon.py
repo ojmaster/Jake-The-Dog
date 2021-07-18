@@ -25,7 +25,8 @@ class Pokemon(commands.Cog):
   async def pokemon(self, ctx, pimg, poke = None):
     """
     Pokeedex entry for Pokemon
-    Usage: pokedex <pokemon>
+    Usage: poke {back} <pokemon>
+    {back} is optional
     """
     if pimg == "back":
       embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
@@ -59,10 +60,11 @@ class Pokemon(commands.Cog):
       os.remove("pokemonf.png")
 
   @commands.command(aliases = ["Shiny"])
-  async def shiny(self, ctx, pimg, poke=None):
+  async def shiny(self, ctx, pimg, poke = None):
     """
     Shiny entry for pokemon
-    Usage: shiny <pokemon>
+    Usage: shiny {back} <pokemon>
+    {back} is optional
     """
     if pimg == "back":
       stitle = str(await self.pokename(poke))
