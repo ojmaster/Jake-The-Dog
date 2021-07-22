@@ -16,6 +16,17 @@ class Utility(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
+  async def on_command_error(self, ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      em = discord.Embed(title="Hey! You're missing arguements!", color=ctx.author.color) 
+      await ctx.send(embed=em)
+    if isinstance(error, commands.MissingPermissions):
+      em = discord.Embed(title="I don't have the right permissions 😢", color=ctx.author.color) 
+      await ctx.send(embed=em)
+    if isinstance(error, commands.CommandNotFound):
+      em = discord.Embed(title="Command not found.", color=ctx.author.color) 
+      await ctx.send(embed=em)
+      
 
   @commands.command()
   async def ping(self, ctx):
