@@ -151,7 +151,7 @@ async def send_join(guild, invite):
 
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py') and not filename.startswith('__init__'):
+    if filename.endswith('.py'):
         bot.load_extension(f'cogs.{filename[:-3]}')
         print(f'cogs.{filename[:-3]}')
 bot.unload_extension('cogs.Owner')
