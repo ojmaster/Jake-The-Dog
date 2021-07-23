@@ -163,10 +163,11 @@ async def servers(ctx):
   if ctx.author == bot.appinfo.owner:
       embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
       for guild in bot.guilds:
-        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}', inline = True)
+        link = str(await guild.text_channels[0].create_invite())
+        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}\nInvite: {link}', inline = True)
       await ctx.reply(embed = embed)
   else:
-    ctx.reply("Insufficient Permissions")
+    ctx.reply("Only available to Bot Owner")
 
 
 @bot.command(name="reload",
