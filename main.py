@@ -163,10 +163,8 @@ async def servers(ctx):
   if ctx.author == bot.appinfo.owner:
       embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
       for guild in bot.guilds:
-        link = guild.text_channels[0]
-        invitetext = await link.create_invite()
-        invt = str(invitetext)
-        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}\nInvite: {invt}', inline = True)
+        srvid = guild.id
+        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}\nID: {srvid}', inline = True)
       await ctx.reply(embed = embed)
   else:
     ctx.reply("Only available to Bot Owner")
