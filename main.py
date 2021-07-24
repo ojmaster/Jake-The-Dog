@@ -20,7 +20,7 @@ def get_prefix(bot, message):
 
 
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 client = discord.Client()
 
 bot.remove_command('help')
