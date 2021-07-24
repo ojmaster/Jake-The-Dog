@@ -25,8 +25,7 @@ class Utility(commands.Cog):
       em = discord.Embed(title="I don't have the right permissions 😢", color=ctx.author.color) 
       await ctx.send(embed=em)
     if isinstance(error, commands.CommandNotFound):
-      em = discord.Embed(title="Command not found.", color=ctx.author.color) 
-      await ctx.send(embed=em)
+      pass
       
 
   @commands.command()
