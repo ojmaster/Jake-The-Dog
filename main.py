@@ -87,7 +87,7 @@ async def on_guild_join(guild):
                                           color=discord.Color.purple())
                     embed.add_field(
                         name="My default prefix is '>''",
-                        value="You can change my prefix with the `>setprefix`",
+                        value="You can change my prefix with the `>setprefix <prefix>`",
                         inline=False)
                     await channel.send(embed=embed)
                     inv = await channel.create_invite()
@@ -103,7 +103,7 @@ async def on_guild_join(guild):
                                           color=discord.Color.purple())
                     embed.add_field(
                         name="My default prefix is '>''",
-                        value="You can change my prefix with the `>setprefix`",
+                        value="You can change my prefix with the `>setprefix <prefix>`",
                         inline=False)
                     await channel.send(embed=embed)
                     inv = await channel.create_invite()
