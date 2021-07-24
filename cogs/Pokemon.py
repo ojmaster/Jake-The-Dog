@@ -21,7 +21,7 @@ class Pokemon(commands.Cog):
     self.bot = bot
 
 
-  @commands.command(aliases = ["poke", "Poke", "Pokemon"])
+  @commands.command(aliases = ["poke"])
   async def pokemon(self, ctx, pimg, poke = None):
     """
     Pokeedex entry for Pokemon
@@ -59,7 +59,7 @@ class Pokemon(commands.Cog):
       await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
       os.remove("pokemonf.png")
 
-  @commands.command(aliases = ["Shiny"])
+  @commands.command()
   async def shiny(self, ctx, pimg, poke = None):
     """
     Shiny entry for pokemon
@@ -102,7 +102,7 @@ class Pokemon(commands.Cog):
       os.remove("shinyf.png")
 
 
-  @commands.command(aliases = ["Pitem"])
+  @commands.command()
   async def pitem(self, ctx, item):
     """
     Pokedex entry for PokeItem! 

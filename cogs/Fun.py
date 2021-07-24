@@ -143,7 +143,7 @@ class Fun(commands.Cog):
       '''Rest in Peace'''
       await ctx.send(f'R.I.P. {member}\nhttps://tenor.com/bipRq.gif')
 
-  @commands.command(aliases=['hypu', 'train'])
+  @commands.command()
   async def hype(self, ctx):
       '''HYPE TRAIN CHOO CHOO'''
       hypu = ['https://cdn.discordapp.com/attachments/102817255661772800/219514281136357376/tumblr_nr6ndeEpus1u21ng6o1_540.gif',
