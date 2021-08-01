@@ -162,7 +162,7 @@ class Pokemon(commands.Cog):
         pokem.types = [typ.capitalize() for typ in pokem.types]
         for typ in pokem.types:
           icon = await self.typeicon(typ)
-          ptype += f'{icon} {typ}\n'
+          ptype += f"{icon} {typ} \n"
     else: 
         pokem = pypokedex.get(name=pokemon)
         ptype = ""
