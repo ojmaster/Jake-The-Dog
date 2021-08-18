@@ -110,7 +110,7 @@ class Utility(commands.Cog):
             if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
               await channel.send(embed = embed, components = [
                   [
-                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
+                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
                   ]
                 ]
               )
@@ -118,7 +118,7 @@ class Utility(commands.Cog):
             else:
               await channel.send(embed = embed, components = [
                   [
-                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
+                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
                   ]
                 ]
               )
