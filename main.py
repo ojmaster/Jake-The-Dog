@@ -6,10 +6,11 @@ import json
 from decouple import config
 import os
 import random
-
+from discord_slash.context import MenuContext
+from discord_slash.model import ContextMenuType
+from discord_slash import SlashCommand
 
 Token = config('TOKEN')
-
 
 def get_prefix(bot, message):
     with open('prefixes.json', 'r') as pr:
@@ -22,6 +23,7 @@ def get_prefix(bot, message):
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 client = discord.Client()
+slash = SlashCommand(bot, sync_commands=True) 
 
 bot.remove_command('help')
 
@@ -56,10 +58,10 @@ async def on_ready():
     DiscordComponents(bot)
     change_stat.start()
 
+
 @tasks.loop(hours = 3)
 async def change_stat():
     await presence()
-
 
 async def listservers():
     print("Server List:")

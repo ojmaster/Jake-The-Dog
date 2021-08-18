@@ -1,10 +1,16 @@
 import discord
 from discord.ext import commands
 import random
+from discord_components.component import Button
 from urbandictionary_top import udtop
 import  aiohttp
 import asyncio
 import json
+from discord_slash.context import MenuContext, ComponentContext
+from discord_slash.model import ContextMenuType, ButtonStyle
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_components import create_button, create_actionrow
+from typing import Union
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -17,16 +23,19 @@ class Fun(commands.Cog):
   def __init__(self, bot):
     self.bot = bot
 
+  async def r34(self, ctx):
+      await ctx.send('https://rb.gy/tkbdmz')
 
-  @commands.command()
+  @cog_ext.cog_slash(name = "Rule34")
+  async def rule34cm(self, ctx: SlashContext):
+    await Fun.r34(self, ctx)
+ 
+  @commands.command(name = "rule34")
   async def rule34(self, ctx):
-    """Horny Time"""
-    await ctx.send('https://rb.gy/tkbdmz')
+      """Horny Time"""
+      await Fun.r34(self, ctx)
 
-  @commands.command(aliases=["bet"])
-  @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-  async def slot(self, ctx):
-      """ Roll the slot machine """
+  async def slotcmd(self, ctx):
       emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
       a = random.choice(emojis)
       b = random.choice(emojis)
@@ -41,6 +50,16 @@ class Fun(commands.Cog):
       else:
           await ctx.send(f"{slotmachine} No match, you lost 😢")
 
+  @commands.command(aliases=["bet"])
+  @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
+  async def slots(self ,ctx):
+      """Roll the slot machine"""
+      await Fun.slotcmd(self, ctx)
+
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Slots")
+  async def slotscm(self, ctx: MenuContext):
+      await Fun.slotcmd(self, ctx)
+
   @commands.command(name="8ball")
   async def eightball(self, ctx, question):
     """Consult the wise master for the answer to your questions"""
@@ -48,11 +67,18 @@ class Fun(commands.Cog):
     response = random.choice(responses)
     await ctx.send(response)
 
+  async def coinflipcmd(self, ctx):
+      coinsides = ["Heads", "Tails"]
+      await ctx.send(f"**{ctx.author.name}** flipped a coin and got **{random.choice(coinsides)}**!")
+
   @commands.command(aliases=["flip", "coin"])
   async def coinflip(self, ctx):
       """ Coinflip! """
-      coinsides = ["Heads", "Tails"]
-      await ctx.send(f"**{ctx.author.name}** flipped a coin and got **{random.choice(coinsides)}**!")
+      await Fun.coinflipcmd(self, ctx)
+
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Coin Flip")
+  async def coinflipcm(self, ctx: MenuContext):
+      await Fun.coinflipcmd(self, ctx)
   
   @commands.command()
   async def urban(self, ctx, *, search):
@@ -84,10 +110,6 @@ class Fun(commands.Cog):
               online.append(i)
       return online
 
-  @commands.command()
-  async def praise(self, ctx):
-      '''Praise the Sun'''
-      await ctx.send('https://i.imgur.com/K8ySn3e.gif')
 
   @commands.command()
   async def countdown(self, ctx):
@@ -107,7 +129,6 @@ class Fun(commands.Cog):
               res = await r.json()
               emojis = [':cat2: ', ':cat: ', ':heart_eyes_cat: ']
               await ctx.send(random.choice(emojis) + res['file'])
-
 
   @commands.command(aliases=['rand'])
   async def random(self, ctx, *arg):
@@ -138,14 +159,16 @@ class Fun(commands.Cog):
               end = int(arg[1])
           await ctx.send(f'**:arrows_counterclockwise:** Random number ({start} - {end}): {random.randint(start, end)}')
 
-  @commands.command()
-  async def rip(self, ctx, member:str):
-      '''Rest in Peace'''
-      await ctx.send(f'R.I.P. {member}\nhttps://tenor.com/bipRq.gif')
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "RIP")
+  async def ripcm(self, ctx: MenuContext):
+      await ctx.send(f'R.I.P. {ctx.target_author.mention}\nhttps://tenor.com/bipRq.gif')
 
   @commands.command()
-  async def hype(self, ctx):
-      '''HYPE TRAIN CHOO CHOO'''
+  async def rip(self, ctx, member:str):
+      """RIP MY GUY"""
+      await ctx.send(f'R.I.P. {member}\nhttps://tenor.com/bipRq.gif')
+
+  async def hypecmd(self, ctx):
       hypu = ['https://cdn.discordapp.com/attachments/102817255661772800/219514281136357376/tumblr_nr6ndeEpus1u21ng6o1_540.gif',
               'https://cdn.discordapp.com/attachments/102817255661772800/219518372839161859/tumblr_n1h2afSbCu1ttmhgqo1_500.gif',
               'https://gfycat.com/HairyFloweryBarebirdbat',
@@ -157,10 +180,12 @@ class Fun(commands.Cog):
       msg = f':train2: CHOO CHOO {random.choice(hypu)}'
       await ctx.send(msg)
 
+  @commands.command()
+  async def hype(self, ctx):
+      '''HYPE TRAIN CHOO CHOO'''
+      await Fun.hypecmd(self, ctx)
 
-  @commands.command(aliases=['joke'])
-  async def pun(self, ctx):
-    '''Because everybody likes bad jokes'''
+  async def puncmd(self, ctx):
     data = json.load(open('./config/pun.json', encoding = "utf8", errors = 'ignore'))
     emojis = ['😆', '😄', '😂', '😭', '🤣']
     puns = [v for d in data['pun'] for k, v in d.items()]
@@ -168,28 +193,44 @@ class Fun(commands.Cog):
     pn = await ctx.send(msg)
     await pn.add_reaction(random.choice(emojis))
 
-  @commands.command()
-  async def tord(self, ctx):
-    """Truth or Dare"""
+  @commands.command(aliases=['joke'])
+  async def pun(self, ctx):
+    '''Because everybody likes bad jokes'''
+    await Fun.puncmd(self, ctx)
+
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Send a Pun")
+  async def puncm(self, ctx: MenuContext):
+    await Fun.puncmd(self, ctx)
+
+  async def tordcmd(self, ctx):
     embed = discord.Embed(title = "Truth or Dare", color = discord.Color.dark_orange())
     embed.add_field(name = "Truth", value = "🇹")
     embed.add_field(name = "Dare", value = "🇩")
-    msg = await ctx.send(embed = embed)
-    await msg.add_reaction("🇹")
-    await msg.add_reaction("🇩")
+    buttons = [
+                  create_button(
+                    style = ButtonStyle.blue,
+                    label = "Truth"
+                  ),
+                  create_button(
+                    style = ButtonStyle.red,
+                    label = "Dare"
+                  )
+                ]
+    action_row = create_actionrow(*buttons)
+    msg = await ctx.send(embed = embed, components = [action_row])
 
-    def check(reaction, user):
-      return user == ctx.message.author and str(reaction.emoji) in ['🇹', '🇩']
+    def check(res):
+        return ctx.author == res.user and res.channel == ctx.channel
 
     try: 
-      reaction, user = await self.bot.wait_for('reaction_add', timeout = 7, check = check)
-      if reaction.emoji == "🇹":
+      res = await self.bot.wait_for('button_click', timeout = 7, check = check)
+      if res.component.label == 'Truth':
           await msg.delete()
           data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['truth'] for k, v in d.items()]
           truthem = discord.Embed(title = "Truth", description = random.choice(values), color = discord.Color.green())
           await ctx.send(embed = truthem)
-      if reaction.emoji == "🇩":
+      elif res.component.label == 'Dare':
           await msg.delete()
           data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['dare'] for k, v in d.items()]
@@ -199,6 +240,15 @@ class Fun(commands.Cog):
     except asyncio.TimeoutError:
       embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
       await ctx.send(embed = embed)
+
+  @commands.command()
+  async def tord(self, ctx):
+    """Truth or Dare"""
+    await Fun.tordcmd(self, ctx)
+
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Truth or Dare")
+  async def tordcm(self, ctx: Union[ComponentContext, MenuContext]):
+      await Fun.tordcmd(self, ctx)
 
 def setup(bot):
 	bot.add_cog(Fun(bot))

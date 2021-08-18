@@ -72,8 +72,8 @@ class Utility(commands.Cog):
     return prefix
 
   @commands.command(hidden=True)
-  @has_permissions(manage_guild=True)
   async def dm(self, ctx, member: discord.Member, *, content):
+    if ctx.author == self.bot.appinfo.owner:
       channel = await member.create_dm()
       await channel.send(content)
 
@@ -81,9 +81,10 @@ class Utility(commands.Cog):
   @has_permissions(manage_guild=True)
   async def updates(self, ctx):
     """See all recent updates to the bot!"""
+    await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="VCGames", value="`activities` - An early beta Discord feature that allows you to play games with friends through a Discord server vc and watch Youtube videos together. \nNOTE: This only works on desktop versions as it has not been implemented in mobile", inline=True)
-    embed.set_footer(text="v1.0.9")
+    embed.add_field(name="Context Menus!", value="Right click a user and navigate to the **Apps** tab, there you can find a few fun commands to use!", inline=True)
+    embed.add_field(name = "Slash Commands", value = "Starting to slowly add slash commands! Look forward to them!", inline = False)
     await ctx.send(embed=embed)
 
   @commands.command()
@@ -94,10 +95,34 @@ class Utility(commands.Cog):
       embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
       await ctx.send(embed = embed, components = [
                 [
-                Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot")
+                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
                 ]
           ]
       )
+
+  @commands.command(hidden = True)
+  async def mass(self, ctx):
+      embed = discord.Embed(title = "Announcement!", color = discord.Color.dark_purple())
+      embed.add_field(name = "ReInvite Me!", value = "Hey all, I have some new features such as slash commands (wip) and context menus. Unfortunately in order for these features to work, you will need to reinvite me to the server!\nAttached in the button is my invite link, you don't need to kick me.\nYou can find out my new features with the `updates` command!")
+      for guild in self.bot.guilds:
+        for channel in guild.channels:
+          if channel.type is discord.ChannelType.text:
+            if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
+              await channel.send(embed = embed, components = [
+                  [
+                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
+                  ]
+                ]
+              )
+              break
+            else:
+              await channel.send(embed = embed, components = [
+                  [
+                    Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
+                  ]
+                ]
+              )
+              break
 
 
 def setup(bot):

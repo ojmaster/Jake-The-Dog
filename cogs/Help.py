@@ -6,7 +6,7 @@ import json
 def get_prefix(bot, message):
   with open('prefixes.json', 'r') as pr:
     prefixes = json.load(pr)
-  return prefixes[str(message.guild.id)]  
+  return prefixes[str(message.guild.id)]
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents)
@@ -56,7 +56,7 @@ class Help(commands.Cog):
     async def help(self, ctx, *input):
         """Shows all modules of that bot"""
 	# !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
-        prefix = ''
+        prefix = get_prefix(self.bot, ctx.message)
         version =  'v1.0'
         name = "Jake The Dog"
         # setting owner name - if you don't wanna be mentioned remove line 49-60 and adjust help text (line 88) 
@@ -80,7 +80,8 @@ class Help(commands.Cog):
             # iterating trough cogs, gathering descriptions
             cogs_desc = ''
             for cog in self.bot.cogs:
-                cogs_desc += f'__**{cog}**__ **{self.bot.cogs[cog].__doc__}**\n'
+                if cog != "ContextMenu":
+                    cogs_desc += f'__**{cog}**__ **{self.bot.cogs[cog].__doc__}**\n'
             # adding 'list' of cogs to embed
             emb.add_field(name='Modules', value=cogs_desc, inline=False)
 
