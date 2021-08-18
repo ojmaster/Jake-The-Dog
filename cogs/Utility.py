@@ -95,7 +95,7 @@ class Utility(commands.Cog):
       embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
       await ctx.send(embed = embed, components = [
                 [
-                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2146954879&scope=bot%20applications.commands")
+                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
                 ]
           ]
       )
