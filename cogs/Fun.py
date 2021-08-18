@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 import random
-from discord_components.component import Button
 from urbandictionary_top import udtop
 import  aiohttp
 import asyncio
