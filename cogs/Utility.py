@@ -102,6 +102,7 @@ class Utility(commands.Cog):
       
   @commands.command(hidden = True)
   async def mass(self, ctx):
+    if ctx.author == self.bot.appinfo.owner:
       embed = discord.Embed(title = "Announcement!", color = discord.Color.dark_purple())
       embed.add_field(name = "Attention Server Owners!", value = "Hey all, I have some new features such as slash commands (wip) and context menus. Unfortunately in order for these features to work, you will need to reinvite me to the server!\nAttached in the button is my invite link, you don't need to kick me.\nYou can find out my new features with the `updates` command!")
       embed.set_footer(text = "Apologies if this was sent multiple times, a check for if you are owner of multiple servers was not made don't hate me")
@@ -109,7 +110,7 @@ class Utility(commands.Cog):
         for member in guild.members:
           if member.id == guild.owner_id and member.id != 649337844074020866 and member.id != 455788606838013963 and member.id != 215170188847480832:
             channel = await member.create_dm()
-            await channel.send(embed = embed, components = [
+            await channel.send(content = f"{guild.name} ✅", embed = embed, components = [
                 [
                   Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
                 ]
