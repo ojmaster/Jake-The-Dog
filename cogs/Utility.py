@@ -100,21 +100,6 @@ class Utility(commands.Cog):
           ]
       )
 
-  @commands.command(hidden = True)
-  async def mass(self, ctx):
-      embed = discord.Embed(title = "Announcement!", color = discord.Color.dark_purple())
-      embed.add_field(name = "Attention Server Owners!", value = "Hey all, I have some new features such as slash commands (wip) and context menus. Unfortunately in order for these features to work, you will need to reinvite me to the server!\nAttached in the button is my invite link, you don't need to kick me.\nYou can find out my new features with the `updates` command!")
-      for guild in self.bot.guilds:
-        for member in guild.members:
-          if member.id == guild.owner_id:
-            channel = await member.create_dm()
-            await channel.send(embed = embed, components = [
-                [
-                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
-                ]
-              ]
-            )
-
 
 def setup(bot):
 	bot.add_cog(Utility(bot))
