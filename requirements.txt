@@ -14,7 +14,7 @@ click==8.0.0
 colorama==0.4.4
 discord.py==1.7.3
 discord-components==0.5.3
-Flask==2.0.0
+discord-py-slash-command==3.0.1
 html5lib==1.1
 idna==2.10
 inflect==0.2.5
@@ -43,7 +43,7 @@ spotipy==2.18.0
 typing-extensions==3.10.0.0
 update-checker==0.18.0
 urbandictionary-top==0.3
-urllib3==1.26.4
+urllib3==1.26.6
 webencodings==0.5.1
 Werkzeug==2.0.0
 yarl==1.6.3

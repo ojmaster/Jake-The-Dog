@@ -2,7 +2,10 @@ import yaml
 import discord
 from discord.ext import commands
 from discord.http import Route
-from discord_components import DiscordComponents, Button, ButtonStyle
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
+from discord_slash.context import ComponentContext
+from discord_slash.model import ButtonStyle
+from discord_slash import cog_ext, SlashContext
 import asyncio
 
 
@@ -12,30 +15,35 @@ class VCGames(commands.Cog):
     """
     def __init__(self, bot):
         self.bot = bot
-        self.dc = DiscordComponents(self.bot)
         self.known_activities = yaml.safe_load(open("config/activities.yaml", "r"))
 
     @commands.command()
-    async def activities(self, ctx, hidden=False):
+    async def activities(self, ctx):
+        await VCGames.activitiescmd(self, ctx)
+
+    @cog_ext.cog_slash(name="Activities", description="Discords Beta VC Games")
+    async def slashactivties(self, ctx: SlashContext):
+        await VCGames.activitiescmd(self, ctx)
+
+    async def activitiescmd(self, ctx):
         """
         The base command for all VC games
         """
-        components = []
+        buttons = []
         for k, _i in self.known_activities.items():
-            components.append(Button(style=ButtonStyle.blue, label=k))
+            buttons.append(create_button(style=ButtonStyle.blue, label=f'{k}', custom_id=f'{k}'))
+        action_row = create_actionrow(*buttons)
         m = await ctx.send(
-            content="Here are your choices.", components=components, hidden=hidden
+            content="Here are your choices.", components=[action_row]
         )
-        res = await self.bot.wait_for("button_click", timeout=60)
-        if not res:
-            await ctx.channel.send("Too Late")
-        else:
+
+        try:
+            res: ComponentContext = await wait_for_component(ctx.bot, components = action_row, timeout=60)
             voice = ctx.author.voice
 
             if not voice:
-                return await res.respond(
-                    content="You have to be in a voice channel to use this command.",
-                    type=7,
+                return await ctx.send(
+                    content="You have to be in a voice channel to use this command."
                 )
 
             r = Route(
@@ -45,26 +53,27 @@ class VCGames(commands.Cog):
             payload = {
                 "max_age": 60,
                 "target_type": 2,
-                "target_application_id": self.known_activities[res.component.label],
+                "target_application_id": self.known_activities[res.component_id],
             }
 
             try:
                 code = (await self.bot.http.request(r, json=payload))["code"]
             except discord.Forbidden:
 
-                return await res.respond(
-                    content="I Need the `Create Invite` permission.", type=7
+                return await ctx.send(
+                    content="I Need the `Create Invite` permission."
                 )
             
-            await res.respond(
+            await ctx.send(
                 embed=discord.Embed(
                     description=f"[Click here!](https://discord.gg/{code})\nLink expires in 1 minute",
                     color=discord.Colour.red(),
-                ),
-                type=4, 
-                ephemeral = False
+                )
             )
 
+        except asyncio.TimeoutError:
+            embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
+            await ctx.send(embed = embed)
 
 def setup(bot):
     bot.add_cog(VCGames(bot))

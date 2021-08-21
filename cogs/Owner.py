@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
-from discord_components import DiscordComponents, Button, ButtonStyle
 import asyncio
-
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 import time
+from discord_slash.model import ButtonStyle
+from discord_slash.context import ComponentContext
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -30,25 +31,24 @@ class Owner(commands.Cog):
       embed.add_field(name = "Streaming", value = ":three:", inline = True)
       embed.add_field(name = "Playing", value = ":four:", inline = True)
       embed.add_field(name = "Competing", value = ":five:")
-      components = [
-                    [
-                      Button(style = ButtonStyle.gray, label = "Watching"), 
-                      Button(style = ButtonStyle.green, label = "Listening"),
-                      Button(style = ButtonStyle.blue, label = "Streaming"),
-                      Button(style = ButtonStyle.red, label = "Playing"),
-                      Button(style = ButtonStyle.gray, label = "Competing")
-                    ]
+      buttons = [
+                      create_button(style = ButtonStyle.gray, label = "Watching", custom_id = "watching"), 
+                      create_button(style = ButtonStyle.green, label = "Listening", custom_id = "listening"),
+                      create_button(style = ButtonStyle.blue, label = "Streaming", custom_id = "streaming"),
+                      create_button(style = ButtonStyle.red, label = "Playing", custom_id = "playing"),
+                      create_button(style = ButtonStyle.gray, label = "Competing", custom_id = "competing")
                   ]
-      msg = await ctx.send(embed = embed, components = components)
+      action_row = create_actionrow(*buttons)
+      msg = await ctx.send(embed = embed, components = [action_row])
 
       # Basic check for user
       def check(res):
-          return ctx.author == res.user and res.channel == ctx.channel
+          return ctx.author == res.author and res.channel == ctx.channel
 
       # Responses
       try: 
-        res = await self.bot.wait_for('button_click', timeout = 7, check = check)
-        if res.component.label == 'Watching':
+        res: ComponentContext = await wait_for_component(ctx.bot, components = [action_row], timeout=7, check = check)
+        if res.component_id == 'watching':
           watch = discord.Embed(title = "What am I watching?", color = discord.Color.dark_red())
           await msg.delete()
           msg = await ctx.send(embed = watch)
@@ -58,7 +58,7 @@ class Owner(commands.Cog):
           watch = discord.Embed(title = f'Watching {presence}', color = discord.Color.red())
           await msg.delete()
           await ctx.send(embed = watch) 
-        elif res.component.label == 'Listening':
+        elif res.component_id == 'listening':
           listen = discord.Embed(title = "What am I listening to?", color = discord.Color.dark_green())
           await msg.delete()
           msg = await ctx.send(embed = listen)
@@ -68,7 +68,7 @@ class Owner(commands.Cog):
           listen = discord.Embed(title = f'Listening to {presence}', color = discord.Color.dark_green())
           await msg.delete()
           await ctx.send(embed = listen) 
-        elif res.component.label == 'Streaming':
+        elif res.component_id == 'streaming':
           stream = discord.Embed(title = "What is the title of the stream?", color = discord.Color.dark_purple())
           await msg.delete()
           msg = await ctx.send(embed = stream)
@@ -83,7 +83,7 @@ class Owner(commands.Cog):
           await msg.delete()
           await self.bot.change_presence(activity=discord.Streaming(name=presence, url=slink))
           await ctx.send(embed = stream)
-        elif res.component.label == 'Playing':
+        elif res.component_id == 'playing':
           play = discord.Embed(title = "What am I playing?", color = discord.Color.dark_blue())
           await msg.delete()
           msg = await ctx.send(embed = play)
@@ -93,7 +93,7 @@ class Owner(commands.Cog):
           play = discord.Embed(title = f'Playing {presence}', color = discord.Color.dark_green())
           await msg.delete()
           await ctx.send(embed = play) 
-        elif res.component.label == 'Competing':
+        elif res.component_id == 'competing':
           compete = discord.Embed(title = "What am I competing in?", color = discord.Color.orange())
           await msg.delete()
           msg = await ctx.send(embed = compete)

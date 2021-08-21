@@ -1,6 +1,8 @@
 import discord
+from discord import guild
 from discord.ext import commands
 import random
+from discord_slash.utils.manage_commands import create_option
 from urbandictionary_top import udtop
 import  aiohttp
 import asyncio
@@ -8,7 +10,7 @@ import json
 from discord_slash.context import MenuContext, ComponentContext
 from discord_slash.model import ContextMenuType, ButtonStyle
 from discord_slash import cog_ext, SlashContext
-from discord_slash.utils.manage_components import create_button, create_actionrow
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from typing import Union
 
 intents = discord.Intents.all()
@@ -55,16 +57,33 @@ class Fun(commands.Cog):
       """Roll the slot machine"""
       await Fun.slotcmd(self, ctx)
 
-  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Slots")
-  async def slotscm(self, ctx: MenuContext):
+  @cog_ext.cog_slash(name = "Slots", description= "Play slots!")
+  async def slotslash(self, ctx:SlashContext):
       await Fun.slotcmd(self, ctx)
 
+  @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Slots")
+  async def slotscm(self, ctx: MenuContext):
+    await Fun.slotcmd(self, ctx)
+
+  @cog_ext.cog_slash(name = "8ball", description="Consult the wise 8ball", options=[
+                                                                                    create_option(
+                                                                                        name = "question",
+                                                                                        description = "Your humble question",
+                                                                                        option_type = 3,
+                                                                                        required= True
+                                                                                    )
+                                                                                ])
+  async def slasheightball(self, ctx: SlashContext, question: str):
+    responses = ["As I see it, yes", "Yes", "No", "Very likely", "Not even close", "Maybe", "Very unlikely", "Ur mom told me yes", "Ur mom told me no", "Ask again later", "Better not tell you now", "Concentrate and ask again", "Don't count on it", " It is certain", "My sources say no", "Outlook good", "You may rely on it", "Very Doubtful", "Without a doubt"]
+    response = random.choice(responses)
+    await ctx.send(content = f'__Question:__ {question} \n__Response:__ {response}')
+  
   @commands.command(name="8ball")
   async def eightball(self, ctx, question):
     """Consult the wise master for the answer to your questions"""
     responses = ["As I see it, yes", "Yes", "No", "Very likely", "Not even close", "Maybe", "Very unlikely", "Ur mom told me yes", "Ur mom told me no", "Ask again later", "Better not tell you now", "Concentrate and ask again", "Don't count on it", " It is certain", "My sources say no", "Outlook good", "You may rely on it", "Very Doubtful", "Without a doubt"]
     response = random.choice(responses)
-    await ctx.send(response)
+    await ctx.reply(response)
 
   async def coinflipcmd(self, ctx):
       coinsides = ["Heads", "Tails"]
@@ -78,12 +97,30 @@ class Fun(commands.Cog):
   @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Coin Flip")
   async def coinflipcm(self, ctx: MenuContext):
       await Fun.coinflipcmd(self, ctx)
+
+  @cog_ext.cog_slash(name = "CoinFlip", description = "Flip a coin!")
+  async def slashcoinflip(self, ctx: SlashContext):
+      await Fun.coinflipcmd(self, ctx)
   
-  @commands.command()
+  @commands.command(aliases = ["urbandictionary", "urbandict"])
   async def urban(self, ctx, *, search):
       """ Find the 'best' definition to your words """
       term = udtop(search)
       search = search.capitalize()
+      embed = discord.Embed(title = f'__{search}__', description = term, color=discord.Color.purple())
+      await ctx.send(embed = embed)
+
+  @cog_ext.cog_slash(name = "UrbanDictionary", description="Find the urban definition of your words", options=[
+                                                                                                                create_option(
+                                                                                                                    name = "word",
+                                                                                                                    description = "Your 'urban' word",
+                                                                                                                    option_type = 3,
+                                                                                                                    required= True
+                                                                                                                )
+                                                                                                            ])
+  async def slashurban(self, ctx: SlashContext, word: str):
+      term = udtop(word)
+      search = word.capitalize()
       embed = discord.Embed(title = f'__{search}__', description = term, color=discord.Color.purple())
       await ctx.send(embed = embed)
 
@@ -201,35 +238,40 @@ class Fun(commands.Cog):
   async def puncm(self, ctx: MenuContext):
     await Fun.puncmd(self, ctx)
 
-  async def tordcmd(self, ctx):
+  async def tordcmd(self, ctx, player):
     embed = discord.Embed(title = "Truth or Dare", color = discord.Color.dark_orange())
     embed.add_field(name = "Truth", value = "🇹")
     embed.add_field(name = "Dare", value = "🇩")
     buttons = [
                   create_button(
                     style = ButtonStyle.blue,
-                    label = "Truth"
+                    label = "Truth",
+                    custom_id="truth"
                   ),
                   create_button(
                     style = ButtonStyle.red,
-                    label = "Dare"
+                    label = "Dare",
+                    custom_id="dare"
                   )
                 ]
     action_row = create_actionrow(*buttons)
-    msg = await ctx.send(embed = embed, components = [action_row])
+    if player != "":
+        msg = await ctx.send(content = f'{player.mention}', embed = embed, components = [action_row])
+    else:
+        msg = await ctx.send(embed = embed, components = [action_row])
 
     def check(res):
-        return ctx.author == res.user and res.channel == ctx.channel
+        return ctx.author == res.author and res.channel == ctx.channel
 
     try: 
-      res = await self.bot.wait_for('button_click', timeout = 7, check = check)
-      if res.component.label == 'Truth':
+      res: ComponentContext = await wait_for_component(ctx.bot, components = [action_row], timeout=7, check = check)
+      if res.component_id == 'truth':
           await msg.delete()
           data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['truth'] for k, v in d.items()]
           truthem = discord.Embed(title = "Truth", description = random.choice(values), color = discord.Color.green())
           await ctx.send(embed = truthem)
-      elif res.component.label == 'Dare':
+      elif res.component_id == 'dare':
           await msg.delete()
           data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
           values = [v for d in data['dare'] for k, v in d.items()]
@@ -240,14 +282,25 @@ class Fun(commands.Cog):
       embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
       await ctx.send(embed = embed)
 
-  @commands.command()
-  async def tord(self, ctx):
+  @commands.command(aliases=["TruthOrDare", "truthdare", "td"])
+  async def tord(self, ctx, user: discord.Member = ""):
     """Truth or Dare"""
-    await Fun.tordcmd(self, ctx)
+    await Fun.tordcmd(self, ctx, user)
 
   @cog_ext.cog_context_menu(target=ContextMenuType.USER, name = "Truth or Dare")
   async def tordcm(self, ctx: Union[ComponentContext, MenuContext]):
-      await Fun.tordcmd(self, ctx)
+    await Fun.tordcmd(self, ctx, ctx.target_author)
+
+  @cog_ext.cog_slash(name = "TruthOrDare", description="A fun game of Truth or Dare", options = [
+                                                                                                create_option(
+                                                                                                    name = "user",
+                                                                                                    description = "User to ask",
+                                                                                                    option_type = 6,
+                                                                                                    required= False
+                                                                                                )
+                                                                                            ])
+  async def slashtord(self, ctx: SlashContext, user = ""):
+    await Fun.tordcmd(self, ctx, user)
 
 def setup(bot):
 	bot.add_cog(Fun(bot))

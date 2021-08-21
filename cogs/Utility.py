@@ -2,8 +2,11 @@ import discord
 from discord.ext import commands
 import time
 import json
-from discord_components import  Button, ButtonStyle
 from discord.ext.commands import has_permissions
+from discord_slash.context import ComponentContext
+from discord_slash.model import ButtonStyle
+from discord_slash.utils.manage_components import create_button, create_actionrow
+from discord_slash import cog_ext, SlashContext
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -87,18 +90,28 @@ class Utility(commands.Cog):
     embed.add_field(name = "Slash Commands", value = "Starting to slowly add slash commands! Look forward to them!", inline = False)
     await ctx.send(embed=embed)
 
+  async def invitecmd(self, ctx):
+      embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
+      buttons = [
+            create_button(
+              style = ButtonStyle.URL, 
+              label = "Invite Link", 
+              url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2095938794424&scope=bot%20applications.commands"
+            )
+      ]
+      action_row = create_actionrow(*buttons)
+      await ctx.send(embed = embed, components = [action_row])
+
   @commands.command()
   async def invite(self, ctx):
-      """
-      Sends the bot's invite link
-      """
-      embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
-      await ctx.send(embed = embed, components = [
-                [
-                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
-                ]
-          ]
-      )
+    """
+    Sends the bot's invite link
+    """
+    await Utility.invitecmd(self, ctx)
+
+  @cog_ext.cog_slash(name="Invite", description="Create an Invite for this bot")
+  async def slashinvite(self, ctx: SlashContext):
+    await Utility.invitecmd(self, ctx)
       
   @commands.command(hidden = True)
   async def mass(self, ctx):
@@ -108,14 +121,17 @@ class Utility(commands.Cog):
       embed.set_footer(text = "Apologies if this was sent multiple times, a check for if you are owner of multiple servers was not made don't hate me")
       for guild in self.bot.guilds:
         for member in guild.members:
-          if member.id == guild.owner_id and member.id != 649337844074020866 and member.id != 455788606838013963 and member.id != 215170188847480832:
+          if member.id == guild.owner_id:
             channel = await member.create_dm()
-            await channel.send(content = f"{guild.name} ✅", embed = embed, components = [
-                [
-                  Button(style = ButtonStyle.URL, label = "Invite Link", url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=261992349303&scope=bot%20applications.commands")
-                ]
-              ]
-            )
+            button = [
+                  create_button(
+                    style = ButtonStyle.URL, 
+                    label = "Invite Link", 
+                    url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2095938794424&scope=bot%20applications.commands"
+                  )
+            ]
+            action_row = create_actionrow(*button)
+            await channel.send(content = f"{guild.name} ✅", embed = embed, components = [action_row])
 
 def setup(bot):
 	bot.add_cog(Utility(bot))
