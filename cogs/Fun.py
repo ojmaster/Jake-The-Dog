@@ -1,3 +1,4 @@
+from logging import error
 import discord
 from discord import guild
 from discord.ext import commands
@@ -265,18 +266,17 @@ class Fun(commands.Cog):
 
     try: 
       res: ComponentContext = await wait_for_component(ctx.bot, components = [action_row], timeout=7, check = check)
-      if res.component_id == 'truth':
-          await msg.delete()
-          data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
-          values = [v for d in data['truth'] for k, v in d.items()]
-          truthem = discord.Embed(title = "Truth", description = random.choice(values), color = discord.Color.green())
-          await ctx.send(embed = truthem)
-      elif res.component_id == 'dare':
-          await msg.delete()
-          data = json.load(open('./config/tord.json', encoding = "utf8", errors = 'ignore'))
-          values = [v for d in data['dare'] for k, v in d.items()]
-          dareem = discord.Embed(title = "Dare", description = random.choice(values), color = discord.Color.dark_magenta())
-          await ctx.send(embed = dareem)
+      await msg.delete()
+      data = json.load(open('./config/tord.json', encoding= "utf8", errors = 'ignore'))
+      values = [v for d in data[f'{res.component_id}'] for k, v in d.items()]
+      if str(res.component_id) == 'truth':
+          embcolor = discord.Color.green()
+          embtitle = 'Truth'
+      elif str(res.component_id) == 'dare':
+          embcolor = discord.Color.red()
+          embtitle = 'Dare'
+      embed = discord.Embed(title = embtitle, description = random.choice(values), color = embcolor)
+      await ctx.send(embed = embed)
 
     except asyncio.TimeoutError:
       embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
