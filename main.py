@@ -22,7 +22,7 @@ def get_prefix(bot, message):
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 client = discord.Client()
-slash = SlashCommand(bot, sync_on_cog_reload=True, sync_commands=True) 
+slash = SlashCommand(bot, sync_commands=True) 
 
 bot.remove_command('help')
 

@@ -1,11 +1,14 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands.errors import TooManyArguments
 import pypokedex
 import urllib.request
-from PIL import Image
+from PIL import Image, ImageSequence
 import os, requests, json, difflib
 import pokepy
-
+from discord_slash.model import ButtonStyle
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option, create_choice
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -22,85 +25,123 @@ class Pokemon(commands.Cog):
 
 
   @commands.command(aliases = ["poke"])
-  async def pokemon(self, ctx, pimg, poke = None):
+  async def pokemon(self, ctx, poke, pimg = None):
     """
     Pokeedex entry for Pokemon
-    Usage: poke {back} <pokemon>
-    {back} is optional
+    Usage: poke <pokemon> {back} 
+    {back} is optional (Defaults to `front` if left empty)
     """
+    await Pokemon.pokemoncmd(self, ctx, poke, pimg)
+
+  @cog_ext.cog_slash(name = "Pokedex", description= "Search up a pokemon", options = [
+                                                                                      create_option(
+                                                                                        name = "pokemon",
+                                                                                        description = "Pokemon to search",
+                                                                                        option_type = 3,
+                                                                                        required = True
+                                                                                      ),
+                                                                                      create_option(
+                                                                                        name = "sprite",
+                                                                                        description = "Back sprite (Leave empty for Front)",
+                                                                                        option_type = 3,
+                                                                                        required = False,
+                                                                                        choices = [
+                                                                                          create_choice(
+                                                                                            name = "front",
+                                                                                            value = "front"
+                                                                                          ),
+                                                                                          create_choice(
+                                                                                            name = "back",
+                                                                                            value = "back"
+                                                                                          )
+                                                                                        ]
+                                                                                      )
+                                                                                    ])
+  async def slashpokemon(self, ctx: SlashContext, pokemon: str, sprite: str = None):
+    await Pokemon.pokemoncmd(self, ctx, pokemon, sprite)
+
+
+  async def pokemoncmd(self, ctx, poke, pimg):
+    embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
+    if not any(map(str.isdigit, poke)):
+        poke = await self.pknamecheck(poke)
+    embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
+    embed.add_field(name = "Type", value = await self.ptype(poke))
+    embed.add_field(name = "Species", value = await self.pspecies(poke))
+    embed.add_field(name = "Height", value = await self.pheight(poke))
+    embed.add_field(name = "Weight", value = await self.pweight(poke))
+    embed.add_field(name = "Main Region", value = await self.region(poke))
+    embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
     if pimg == "back":
-      embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
-      if not any(map(str.isdigit, poke)):
-          poke = await self.pknamecheck(poke)
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-      embed.add_field(name = "Type", value = await self.ptype(poke))
-      embed.add_field(name = "Species", value = await self.pspecies(poke))
-      embed.add_field(name = "Height", value = await self.pheight(poke))
-      embed.add_field(name = "Weight", value = await self.pweight(poke))
-      embed.add_field(name = "Main Region", value = await self.region(poke))
-      embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       await self.bimg(poke)
       embed.set_image(url="attachment://pokemonb.png")
       await ctx.send(file = discord.File("pokemonb.png"), embed = embed)
       os.remove("pokemonb.png")
-    else: 
-      embed = discord.Embed(title = await self.pokename(pimg), color = discord.Color.red())
-      if not any(map(str.isdigit, pimg)):
-          pimg = await self.pknamecheck(pimg)
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(pimg).id)
-      embed.add_field(name = "Type", value = await self.ptype(pimg))
-      embed.add_field(name = "Species", value = await self.pspecies(pimg))
-      embed.add_field(name = "Height", value = await self.pheight(pimg))
-      embed.add_field(name = "Weight", value = await self.pweight(pimg))
-      embed.add_field(name = "Main Region", value = await self.region(pimg))
-      embed.add_field(name = "Entry", value = await self.entry(pimg), inline = False)
-      await self.pimg(pimg)
+    else:
+      await self.pimg(poke)
       embed.set_image(url="attachment://pokemonf.png")
       await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
       os.remove("pokemonf.png")
 
   @commands.command()
-  async def shiny(self, ctx, pimg, poke = None):
+  async def shiny(self, ctx, poke, pimg = None):
     """
     Shiny entry for pokemon
-    Usage: shiny {back} <pokemon>
-    {back} is optional
+    Usage: shiny <pokemon> {back}
+    {back} is optional (Defaults to `front` if left empty)
     """
+    await Pokemon.shinycmd(self, ctx, poke, pimg)
+
+  @cog_ext.cog_slash(name = "ShinyPokedex", description= "Search up a shiny pokemon", options = [
+                                                                                                  create_option(
+                                                                                                    name = "pokemon",
+                                                                                                    description = "Pokemon to search",
+                                                                                                    option_type = 3,
+                                                                                                    required = True
+                                                                                                  ),
+                                                                                                  create_option(
+                                                                                                    name = "sprite",
+                                                                                                    description = "Back sprite (Leave empty for Front)",
+                                                                                                    option_type = 3,
+                                                                                                    required = False,
+                                                                                                    choices = [
+                                                                                                      create_choice(
+                                                                                                        name = "front",
+                                                                                                        value = "front"
+                                                                                                      ),
+                                                                                                      create_choice(
+                                                                                                        name = "back",
+                                                                                                        value = "back"
+                                                                                                      )
+                                                                                                    ]
+                                                                                                  )
+                                                                                                ])
+  async def slashshiny(self, ctx: SlashContext, pokemon: str, sprite: str = None):
+    await Pokemon.shinycmd(self, ctx, pokemon, sprite)
+
+  async def shinycmd(self, ctx, poke, pimg):
+    stitle = str(await self.pokename(poke))
+    embedtitle = f'Shiny {stitle}'
+    embed = discord.Embed(title = embedtitle, color = discord.Color.red())
+    if not any(map(str.isdigit, poke)):
+        poke = await self.pknamecheck(poke)
+    embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
+    embed.add_field(name = "Type", value = await self.ptype(poke))
+    embed.add_field(name = "Species", value = await self.pspecies(poke))
+    embed.add_field(name = "Height", value = await self.pheight(poke))
+    embed.add_field(name = "Weight", value = await self.pweight(poke))
+    embed.add_field(name = "Main Region", value = await self.region(poke))
+    embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
     if pimg == "back":
-      stitle = str(await self.pokename(poke))
-      embedtitle = f'Shiny {stitle}'
-      embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      if not any(map(str.isdigit, poke)):
-          poke = await self.pknamecheck(poke)
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-      embed.add_field(name = "Type", value = await self.ptype(poke))
-      embed.add_field(name = "Species", value = await self.pspecies(poke))
-      embed.add_field(name = "Height", value = await self.pheight(poke))
-      embed.add_field(name = "Weight", value = await self.pweight(poke))
-      embed.add_field(name = "Main Region", value = await self.region(poke))
-      embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       await self.bsimg(poke)
       embed.set_image(url="attachment://shinyb.png")
       await ctx.send(file = discord.File("shinyb.png"), embed = embed)
       os.remove("shinyb.png")
-    else: 
-      stitle = str(await self.pokename(pimg))
-      embedtitle = f'Shiny {stitle}'
-      embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      if not any(map(str.isdigit, pimg)):
-          pimg = await self.pknamecheck(pimg)
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(pimg).id)
-      embed.add_field(name = "Type", value = await self.ptype(pimg))
-      embed.add_field(name = "Species", value = await self.pspecies(pimg))
-      embed.add_field(name = "Height", value = await self.pheight(pimg))
-      embed.add_field(name = "Weight", value = await self.pweight(pimg))
-      embed.add_field(name = "Main Region", value = await self.region(pimg))
-      embed.add_field(name = "Entry", value = await self.entry(pimg), inline = False)
-      await self.psimg(pimg)
+    else:
+      await self.psimg(poke)
       embed.set_image(url="attachment://shinyf.png")
       await ctx.send(file = discord.File("shinyf.png"), embed = embed)
       os.remove("shinyf.png")
-
 
   @commands.command()
   async def pitem(self, ctx, item):
@@ -108,6 +149,20 @@ class Pokemon(commands.Cog):
     Pokedex entry for PokeItem! 
     Usage: pitem <item>
     """
+    await Pokemon.pitemcmd(self, ctx, item)
+
+  @cog_ext.cog_slash(name = "PokeItem", description = "Search up any pokemon item", options = [
+                                                                                                create_option(
+                                                                                                  name = "item",
+                                                                                                  description = "Item to search",
+                                                                                                  option_type= 3,
+                                                                                                  required = True
+                                                                                                )
+                                                                                              ])
+  async def slashpitem(self, ctx: SlashContext, item):
+    await Pokemon.pitemcmd(self, ctx, item)
+
+  async def pitemcmd(self, ctx, item):
     embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
     if not any(map(str.isdigit, item)):
       item = await self.namecheck(item)
@@ -121,55 +176,62 @@ class Pokemon(commands.Cog):
     os.remove("item.png")
 
 
-  @commands.command()
+  @commands.command(aliases = ["pokedata"])
   async def pdata(self, ctx, pokemon):
-        """
-        Pokemon Detailed Info
-        """
-        if not any(map(str.isdigit, pokemon)):
-          pokemon = await self.pknamecheck(pokemon)
-        pkid = pykemon.get_pokemon(pokemon).name
-        pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
-        stat = pykemon.get_pokemon(pokemon)
-        embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
-        embed.set_image(url = pimg)
-        embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
-        embed.add_field(name = "Type", value = await self.ptype(pokemon, "data"))
-        embed.add_field(name = "Abilities", value = await self.pability(pokemon))
-        embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
-        embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
-        embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
-        embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
-        embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
-        embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
-        await ctx.send(embed = embed)
+    """
+    Pokemon Detailed Info
+    """
+    await Pokemon.pdatacmd(self, ctx, pokemon)
+
+  @cog_ext.cog_slash(name = "PokeData", description = "In-Depth data of a Pokemon", options = [
+                                                                                              create_option(
+                                                                                                name = "pokemon",
+                                                                                                description = "Pokemon to search",
+                                                                                                option_type = 3,
+                                                                                                required = True  
+                                                                                              )
+                                                                                            ])
+  async def slashpdata(self, ctx: SlashContext, pokemon):
+    await Pokemon.pdatacmd(self, ctx, pokemon)
+
+
+  async def pdatacmd(self, ctx, pokemon):
+    if not any(map(str.isdigit, pokemon)):
+      pokemon = await self.pknamecheck(pokemon)
+    pkid = pykemon.get_pokemon(pokemon).name
+    pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
+    stat = pykemon.get_pokemon(pokemon)
+    embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
+    embed.set_image(url = pimg)
+    embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
+    embed.add_field(name = "Type", value = await self.ptype(pokemon))
+    embed.add_field(name = "Abilities", value = await self.pability(pokemon))
+    embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
+    embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
+    embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
+    embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
+    embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
+    embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
+    await ctx.send(embed = embed)
 
   async def pstat(self, pokemon):
         pstat = pykemon.get_pokemon(pokemon)
         data = [[str(pstat.stats[0].base_stat), str(pstat.stats[1].base_stat), str(pstat.stats[2].base_stat)], [str(pstat.stats[3].base_stat), str(pstat.stats[4].base_stat), str(pstat.stats[5].base_stat)]]
-        pkst =  "`{: >0} {: >12} {: >12}`\n".format("HP", "Atk", "Def")
+        pkst =  "`{: >0} {: >13} {: >13}`\n".format("HP", "Atk", "Def")
         row = data[0]
-        pkst = pkst + "`{: >0} {: >11} {: >12}`\n".format(*row)
-        pkst += "`{: >0} {: >11} {: >8}`\n".format("Sp. Atk", "Sp. Def", "Spe")
+        pkst = pkst + "`{: >0} {: >12} {: >13}`\n".format(*row)
+        pkst += "`{: >0} {: >12} {: >9}`\n".format("Sp. Atk", "Sp. Def", "Spe")
         row = data[1]
-        pkst = pkst + "`{: >0} {: >11} {: >12}`\n".format(*row)
+        pkst = pkst + "`{: >0} {: >12} {: >13}`\n".format(*row)
         return pkst
 
-  async def ptype(self, pokemon, ptyp = "urmom"):
-    if ptyp == "data":
-        pokem = pypokedex.get(name=pokemon)
-        ptype = ""
-        pokem.types = [typ.capitalize() for typ in pokem.types]
-        for typ in pokem.types:
-          icon = await self.typeicon(typ)
-          ptype += f"{icon} {typ} \n"
-    else: 
-        pokem = pypokedex.get(name=pokemon)
-        ptype = ""
-        pokem.types = [typ.capitalize() for typ in pokem.types]
-        for typ in pokem.types:
-          icon = await self.typeicon(typ)
-          ptype += f'{icon} {typ} '
+  async def ptype(self, pokemon):
+    pokem = pypokedex.get(name=pokemon)
+    ptype = ""
+    pokem.types = [typ.capitalize() for typ in pokem.types]
+    for typ in pokem.types:
+      icon = await self.typeicon(typ)
+      ptype += f'{icon} {typ} \n'
     return ptype
 
 
@@ -232,7 +294,6 @@ class Pokemon(commands.Cog):
     lbs = pk * 2.205
     pk = str(pk) + " kg " + f'({lbs:0.1f} lbs)'
     return str(pk)
-
 
   async def pimg(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
