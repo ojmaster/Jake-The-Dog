@@ -29,10 +29,6 @@ class Utility(commands.Cog):
       await ctx.send(embed=em)
     if isinstance(error, commands.CommandNotFound):
       pass
-    if IndexError(error, IndexError):
-      em = discord.Embed(title = "Did you mess up somewhere?", color = ctx.author.color)
-      await ctx.send(embed=em)
-      
 
   @commands.command()
   async def ping(self, ctx):

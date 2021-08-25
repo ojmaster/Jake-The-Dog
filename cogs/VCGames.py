@@ -33,6 +33,7 @@ class VCGames(commands.Cog):
         for k, _i in self.known_activities.items():
             buttons.append(create_button(style=ButtonStyle.blue, label=f'{k}', custom_id=f'{k}'))
         action_row = create_actionrow(*buttons)
+
         m = await ctx.send(
             content="Here are your choices.", components=[action_row]
         )

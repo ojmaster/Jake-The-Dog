@@ -9,6 +9,7 @@ import pokepy
 from discord_slash.model import ButtonStyle
 from discord_slash import cog_ext, SlashContext
 from discord_slash.utils.manage_commands import create_option, create_choice
+import asyncio
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -62,26 +63,30 @@ class Pokemon(commands.Cog):
 
 
   async def pokemoncmd(self, ctx, poke, pimg):
-    embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
-    if not any(map(str.isdigit, poke)):
-        poke = await self.pknamecheck(poke)
-    embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-    embed.add_field(name = "Type", value = await self.ptype(poke))
-    embed.add_field(name = "Species", value = await self.pspecies(poke))
-    embed.add_field(name = "Height", value = await self.pheight(poke))
-    embed.add_field(name = "Weight", value = await self.pweight(poke))
-    embed.add_field(name = "Main Region", value = await self.region(poke))
-    embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
-    if pimg == "back":
-      await self.bimg(poke)
-      embed.set_image(url="attachment://pokemonb.png")
-      await ctx.send(file = discord.File("pokemonb.png"), embed = embed)
-      os.remove("pokemonb.png")
-    else:
-      await self.pimg(poke)
-      embed.set_image(url="attachment://pokemonf.png")
-      await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
-      os.remove("pokemonf.png")
+    try:
+      embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
+      if not any(map(str.isdigit, poke)):
+          poke = await self.pknamecheck(poke)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
+      embed.add_field(name = "Type", value = await self.ptype(poke))
+      embed.add_field(name = "Species", value = await self.pspecies(poke))
+      embed.add_field(name = "Height", value = await self.pheight(poke))
+      embed.add_field(name = "Weight", value = await self.pweight(poke))
+      embed.add_field(name = "Main Region", value = await self.region(poke))
+      embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
+      if pimg == "back":
+        await self.bimg(poke)
+        embed.set_image(url="attachment://pokemonb.png")
+        await ctx.send(file = discord.File("pokemonb.png"), embed = embed)
+        os.remove("pokemonb.png")
+      else:
+        await self.pimg(poke)
+        embed.set_image(url="attachment://pokemonf.png")
+        await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
+        os.remove("pokemonf.png")
+    except IndexError:
+      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
+      await ctx.send(embed = embed)
 
   @commands.command()
   async def shiny(self, ctx, poke, pimg = None):
@@ -120,28 +125,32 @@ class Pokemon(commands.Cog):
     await Pokemon.shinycmd(self, ctx, pokemon, sprite)
 
   async def shinycmd(self, ctx, poke, pimg):
-    stitle = str(await self.pokename(poke))
-    embedtitle = f'Shiny {stitle}'
-    embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-    if not any(map(str.isdigit, poke)):
-        poke = await self.pknamecheck(poke)
-    embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-    embed.add_field(name = "Type", value = await self.ptype(poke))
-    embed.add_field(name = "Species", value = await self.pspecies(poke))
-    embed.add_field(name = "Height", value = await self.pheight(poke))
-    embed.add_field(name = "Weight", value = await self.pweight(poke))
-    embed.add_field(name = "Main Region", value = await self.region(poke))
-    embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
-    if pimg == "back":
-      await self.bsimg(poke)
-      embed.set_image(url="attachment://shinyb.png")
-      await ctx.send(file = discord.File("shinyb.png"), embed = embed)
-      os.remove("shinyb.png")
-    else:
-      await self.psimg(poke)
-      embed.set_image(url="attachment://shinyf.png")
-      await ctx.send(file = discord.File("shinyf.png"), embed = embed)
-      os.remove("shinyf.png")
+    try:
+      stitle = str(await self.pokename(poke))
+      embedtitle = f'Shiny {stitle}'
+      embed = discord.Embed(title = embedtitle, color = discord.Color.red())
+      if not any(map(str.isdigit, poke)):
+          poke = await self.pknamecheck(poke)
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
+      embed.add_field(name = "Type", value = await self.ptype(poke))
+      embed.add_field(name = "Species", value = await self.pspecies(poke))
+      embed.add_field(name = "Height", value = await self.pheight(poke))
+      embed.add_field(name = "Weight", value = await self.pweight(poke))
+      embed.add_field(name = "Main Region", value = await self.region(poke))
+      embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
+      if pimg == "back":
+        await self.bsimg(poke)
+        embed.set_image(url="attachment://shinyb.png")
+        await ctx.send(file = discord.File("shinyb.png"), embed = embed)
+        os.remove("shinyb.png")
+      else:
+        await self.psimg(poke)
+        embed.set_image(url="attachment://shinyf.png")
+        await ctx.send(file = discord.File("shinyf.png"), embed = embed)
+        os.remove("shinyf.png")
+    except IndexError:
+      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
+      await ctx.send(embed = embed)
 
   @commands.command()
   async def pitem(self, ctx, item):
@@ -163,18 +172,21 @@ class Pokemon(commands.Cog):
     await Pokemon.pitemcmd(self, ctx, item)
 
   async def pitemcmd(self, ctx, item):
-    embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
-    if not any(map(str.isdigit, item)):
-      item = await self.namecheck(item)
-    embed.add_field(name = "ID", value = await self.iid(item))
-    embed.add_field(name = "Category", value = await self.icat(item))
-    embed.add_field(name = "Entry", value = await self.iflvtxt(item))
-    embed.add_field(name = "Effect", value = await self.ieffect(item))
-    await self.ipic(item)
-    embed.set_thumbnail(url = "attachment://item.png")
-    await ctx.send(file = discord.File("item.png"), embed = embed)
-    os.remove("item.png")
-
+    try:
+      embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
+      if not any(map(str.isdigit, item)):
+        item = await self.namecheck(item)
+      embed.add_field(name = "ID", value = await self.iid(item))
+      embed.add_field(name = "Category", value = await self.icat(item))
+      embed.add_field(name = "Entry", value = await self.iflvtxt(item))
+      embed.add_field(name = "Effect", value = await self.ieffect(item))
+      await self.ipic(item)
+      embed.set_thumbnail(url = "attachment://item.png")
+      await ctx.send(file = discord.File("item.png"), embed = embed)
+      os.remove("item.png")
+    except IndexError:
+      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
+      await ctx.send(embed = embed)
 
   @commands.command(aliases = ["pokedata"])
   async def pdata(self, ctx, pokemon):
@@ -196,23 +208,27 @@ class Pokemon(commands.Cog):
 
 
   async def pdatacmd(self, ctx, pokemon):
-    if not any(map(str.isdigit, pokemon)):
-      pokemon = await self.pknamecheck(pokemon)
-    pkid = pykemon.get_pokemon(pokemon).name
-    pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
-    stat = pykemon.get_pokemon(pokemon)
-    embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
-    embed.set_image(url = pimg)
-    embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
-    embed.add_field(name = "Type", value = await self.ptype(pokemon))
-    embed.add_field(name = "Abilities", value = await self.pability(pokemon))
-    embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
-    embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
-    embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
-    embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
-    embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
-    embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
-    await ctx.send(embed = embed)
+    try:
+      if not any(map(str.isdigit, pokemon)):
+        pokemon = await self.pknamecheck(pokemon)
+      pkid = pykemon.get_pokemon(pokemon).name
+      pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
+      stat = pykemon.get_pokemon(pokemon)
+      embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
+      embed.set_image(url = pimg)
+      embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
+      embed.add_field(name = "Type", value = await self.ptype(pokemon))
+      embed.add_field(name = "Abilities", value = await self.pability(pokemon))
+      embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
+      embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
+      embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
+      embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
+      embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
+      embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
+      await ctx.send(embed = embed)
+    except IndexError:
+      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
+      await ctx.send(embed = embed)
 
   async def pstat(self, pokemon):
         pstat = pykemon.get_pokemon(pokemon)

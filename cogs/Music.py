@@ -381,7 +381,7 @@ class VoiceState:
 class Music(commands.Cog):
     """
     All your music needs
-    (Now can read spotify links)
+    (Can read Youtube, Soundcloud, Spotify (buggy), and many more)
     """
     def __init__(self, bot: commands.Bot):
         self.bot = bot
