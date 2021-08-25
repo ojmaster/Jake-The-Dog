@@ -85,8 +85,8 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Context Menus!", value="Right click a user and navigate to the **Apps** tab, there you can find a few fun commands to use!", inline=True)
-    embed.add_field(name = "Slash Commands", value = "Starting to slowly add slash commands! Look forward to them!", inline = False)
+    embed.add_field(name="Music update", value="Bot now properly reads Youtube, Soundcloud, Spotify (although still very buggy), and a host of other players.", inline=True)
+    embed.add_field(name = "Removed commands from `Fun`", value = "Some smaller unused commands were removed and hopefully will be replaced with newer better commands in the future!", inline = False)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):
