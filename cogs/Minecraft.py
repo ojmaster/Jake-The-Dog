@@ -139,7 +139,7 @@ class Minecraft(commands.Cog):
         """
         await Minecraft.mcbedrockcmd(self, ctx, ip, port)
 
-    @cog_ext.cog_slash(name = "McBedrockLookup", description = "Minecraft Bedrock Server Info", guild_ids = [651230389171650560], options = [
+    @cog_ext.cog_slash(name = "McBedrockLookup", description = "Minecraft Bedrock Server Info", options = [
         create_option(
             name = "ip",
             description = "Minecraft Server IP",
