@@ -3,6 +3,7 @@ import functools
 import itertools
 import math
 import random
+from configparser import ConfigParser
 
 import discord
 import youtube_dl
@@ -17,12 +18,11 @@ from progress.bar import Bar
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
-with open("SpotipyClientID.txt", "r") as scid:
-    spotipy_id = scid.read().strip()
-    scid.close()
-with open("SpotipyClientSecret.txt", "r") as scs:
-    spotipy_secret = scs.read().strip()
-    scs.close()
+config = ConfigParser()
+config.read('./config/options.ini')
+spotipy_id = config.get('Spotify_Configuration', 'SpotipyClientID')
+spotipy_secret = config.get('Spotify_Configuration', 'SpotipyClientSecret')
+
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id=spotipy_id, client_secret=spotipy_secret))
 
 class VoiceError(Exception):

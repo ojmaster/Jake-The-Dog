@@ -2,14 +2,16 @@ import discord
 import time
 from discord.ext import commands, tasks
 import json
-from decouple import config
+from configparser import ConfigParser
 import os
 import random
 from discord_slash.context import MenuContext
 from discord_slash.model import ContextMenuType
 from discord_slash import SlashCommand
 
-Token = config('TOKEN')
+config = ConfigParser()
+config.read('./config/options.ini')
+TOKEN = config.get('Bot_Config', 'TOKEN')
 
 def get_prefix(bot, message):
     with open('prefixes.json', 'r') as pr:
@@ -53,7 +55,7 @@ async def on_ready():
     await presence()
     if not hasattr(bot, 'appinfo'):
         bot.appinfo = await bot.application_info()
-    await client.login(config('TOKEN'))
+    await client.login(TOKEN)
     change_stat.start()
 
 
@@ -197,4 +199,4 @@ async def unload(ctx, extension):
   else:
     ctx.reply("Insufficient Permissions")
 
-bot.run(config('TOKEN'))
+bot.run(TOKEN)
