@@ -236,11 +236,8 @@ class Fun(commands.Cog):
         else:
             msg = await ctx.send(embed=embed, components=[action_row])
 
-        def check(res):
-            return ctx.author == res.author and res.channel == ctx.channel
-
         try:
-            res: ComponentContext = await wait_for_component(ctx.bot, components=[action_row], timeout=7, check=check)
+            res: ComponentContext = await wait_for_component(ctx.bot, components=[action_row], timeout=15)
             await msg.delete()
             data = json.load(
                 open('./config/tord.json', encoding="utf8", errors='ignore'))
