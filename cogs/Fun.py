@@ -113,7 +113,7 @@ class Fun(commands.Cog):
         term = udtop(search)
         search = search.capitalize()
         embed = discord.Embed(
-            title=f'__{search}__', description=term, color=discord.Color.purple())
+            title=f'__{search}__', description=str(term).replace("Example:", "__Example:__"), color=discord.Color.purple())
         await ctx.send(embed=embed)
 
     @cog_ext.cog_slash(name="UrbanDictionary", description="Find the urban definition of your words", options=[
