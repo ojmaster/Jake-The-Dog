@@ -77,18 +77,20 @@ class Fun(commands.Cog):
         )
     ])
     async def slasheightball(self, ctx: SlashContext, question: str):
-        responses = ["As I see it, yes", "Yes", "No", "Very likely", "Not even close", "Maybe", "Very unlikely", "Ur mom told me yes", "Ur mom told me no", "Ask again later",
-                     "Better not tell you now", "Concentrate and ask again", "Don't count on it", " It is certain", "My sources say no", "Outlook good", "You may rely on it", "Very Doubtful", "Without a doubt"]
-        response = random.choice(responses)
-        await ctx.send(content=f'__Question:__ {question} \n__Response:__ {response}')
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        responses = [v for d in data['eightball'] for k, v in d.items()]
+        msg = f'{random.choice(responses)}'
+        await ctx.send(content=f'__Question:__ {question} \n__Response:__ {msg}')
 
     @commands.command(name="8ball")
     async def eightball(self, ctx, question):
         """Consult the wise master for the answer to your questions"""
-        responses = ["As I see it, yes", "Yes", "No", "Very likely", "Not even close", "Maybe", "Very unlikely", "Ur mom told me yes", "Ur mom told me no", "Ask again later",
-                     "Better not tell you now", "Concentrate and ask again", "Don't count on it", " It is certain", "My sources say no", "Outlook good", "You may rely on it", "Very Doubtful", "Without a doubt"]
-        response = random.choice(responses)
-        await ctx.reply(response)
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        responses = [v for d in data['eightball'] for k, v in d.items()]
+        msg = f'{random.choice(responses)}'
+        await ctx.reply(msg)
 
     async def coinflipcmd(self, ctx):
         coinsides = ["Heads", "Tails"]
@@ -193,7 +195,7 @@ class Fun(commands.Cog):
 
     async def puncmd(self, ctx):
         data = json.load(
-            open('./config/pun.json', encoding="utf8", errors='ignore'))
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
         emojis = ['😆', '😄', '😂', '😭', '🤣']
         puns = [v for d in data['pun'] for k, v in d.items()]
         msg = f'{random.choice(puns)}'
@@ -240,7 +242,7 @@ class Fun(commands.Cog):
             res: ComponentContext = await wait_for_component(ctx.bot, components=[action_row], timeout=15)
             await msg.delete()
             data = json.load(
-                open('./config/tord.json', encoding="utf8", errors='ignore'))
+                open('./config/choices.json', encoding="utf8", errors='ignore'))
             values = [v for d in data[f'{res.component_id}']
                       for k, v in d.items()]
             if str(res.component_id) == 'truth':
