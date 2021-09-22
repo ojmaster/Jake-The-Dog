@@ -128,22 +128,23 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_guild_remove(guild):
-    msg = bot.get_channel(837556075305500672)
-    embed = discord.Embed(title = "**Left Guild**", color=discord.Color.blurple())
-    embed.add_field(name = "__Name__", value = str(guild.name))
-    embed.add_field(name = "__ID__", value = str(guild.id))
-    embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
-    embed.add_field(name = "__Members__", value = str(guild.member_count))
-    count = sum(
-        member.status != discord.Status.offline for member in guild.members
-    )
-    embed.add_field(name = "__Online__", value = str(count))
-    embed.set_thumbnail(url = str(guild.icon_url))
-    await msg.send(embed = embed)
-    with open('prefixes.json', 'r') as pr:
-        prefixes = json.load(pr)
-    with open('prefixes.json', 'w') as pr:
-        json.dump(prefixes, pr, indent=4)
+  msg = bot.get_channel(837556075305500672)
+  embed = discord.Embed(title = "**Left Guild**", color=discord.Color.blurple())
+  embed.add_field(name = "__Name__", value = str(guild.name))
+  embed.add_field(name = "__ID__", value = str(guild.id))
+  embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
+  embed.add_field(name = "__Members__", value = str(guild.member_count))
+  count = 0
+  for member in guild.members:
+    if member.status != discord.Status.offline:
+      count +=1
+  embed.add_field(name = "__Online__", value = str(count))
+  embed.set_thumbnail(url = str(guild.icon_url))
+  await msg.send(embed = embed)
+  with open('prefixes.json', 'r') as pr:
+      prefixes = json.load(pr)
+  with open('prefixes.json', 'w') as pr:
+      json.dump(prefixes, pr, indent=4)
 
 
 async def send_join(guild, invite):
