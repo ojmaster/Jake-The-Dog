@@ -1,7 +1,9 @@
-import discord
-from discord.ext import commands
-from discord.errors import Forbidden
 import json
+
+import discord
+from discord.errors import Forbidden
+from discord.ext import commands
+
 
 def get_prefix(bot, message):
   with open('prefixes.json', 'r') as pr:
