@@ -1,15 +1,12 @@
-import asyncio
-
-import discord
 import yaml
+import discord
 from discord.ext import commands
 from discord.http import Route
-from discord_slash import SlashContext, cog_ext
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
 from discord_slash.context import ComponentContext
 from discord_slash.model import ButtonStyle
-from discord_slash.utils.manage_components import (create_actionrow,
-                                                   create_button,
-                                                   wait_for_component)
+from discord_slash import cog_ext, SlashContext
+import asyncio
 
 
 class VCGames(commands.Cog):

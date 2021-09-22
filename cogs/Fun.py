@@ -1,21 +1,18 @@
-import asyncio
-import json
-import random
 from logging import error
-from typing import Union
-
-import aiohttp
 import discord
 from discord import guild
 from discord.ext import commands
-from discord_slash import SlashContext, cog_ext
-from discord_slash.context import ComponentContext, MenuContext
-from discord_slash.model import ButtonStyle, ContextMenuType
+import random
 from discord_slash.utils.manage_commands import create_option
-from discord_slash.utils.manage_components import (create_actionrow,
-                                                   create_button,
-                                                   wait_for_component)
 from urbandictionary_top import udtop
+import aiohttp
+import asyncio
+import json
+from discord_slash.context import MenuContext, ComponentContext
+from discord_slash.model import ContextMenuType, ButtonStyle
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
+from typing import Union
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -150,11 +147,11 @@ class Fun(commands.Cog):
         print('Error in {0.command.qualified_name}: {1}'.format(ctx, error))
 
     def userOnline(self, memberList):
-        return [
-            i
-            for i in memberList
-            if i.status == discord.Status.online and i.bot == False
-        ]
+        online = []
+        for i in memberList:
+            if i.status == discord.Status.online and i.bot == False:
+                online.append(i)
+        return online
 
     @commands.command(aliases=["countdown"])
     async def timer(self, ctx, number: int):

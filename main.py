@@ -79,50 +79,41 @@ async def on_guild_join(guild):
     bs = False
     global inv
     for channel in guild.channels:
-        if (
-            channel.type is discord.ChannelType.text
-            and (
-                "chat" in channel.name
-                or "staff" in channel.name
-                or "main" in channel.name
-                or "general" in channel.name
-            )
-            and channel.permissions_for(guild.me).send_messages
-        ):
-            time.sleep(0.1)
-            embed = discord.Embed(title="**Jake the Dog**",
-                                  description="Heyo!",
-                                  color=discord.Color.purple())
-            embed.add_field(
-                name="My default prefix is '>''",
-                value="You can change my prefix with the `>setprefix <prefix>`",
-                inline=False)
-            await channel.send(embed=embed)
-            inv = await channel.create_invite()
-            bs = True
-            break
-    if not bs:
+        if channel.type is discord.ChannelType.text:
+            if "chat" in channel.name or "staff" in channel.name or "main" in channel.name or "general" in channel.name:
+                if channel.permissions_for(guild.me).send_messages:
+                    time.sleep(0.1)
+                    embed = discord.Embed(title="**Jake the Dog**",
+                                          description="Heyo!",
+                                          color=discord.Color.purple())
+                    embed.add_field(
+                        name="My default prefix is '>''",
+                        value="You can change my prefix with the `>setprefix <prefix>`",
+                        inline=False)
+                    await channel.send(embed=embed)
+                    inv = await channel.create_invite()
+                    bs = True
+                    break
+    if bs == False:
         for channel in guild.channels:
-            if (
-                channel.type is discord.ChannelType.text
-                and channel.permissions_for(guild.me).send_messages
-            ):
-                time.sleep(0.1)
-                embed = discord.Embed(title="**Jake the Dog**",
-                                      description="Heyo!",
-                                      color=discord.Color.purple())
-                embed.add_field(
-                    name="My default prefix is '>''",
-                    value="You can change my prefix with the `>setprefix <prefix>`",
-                    inline=False)
-                await channel.send(embed=embed)
-                inv = await channel.create_invite()
-                break
+            if channel.type is discord.ChannelType.text:
+                if channel.permissions_for(guild.me).send_messages:
+                    time.sleep(0.1)
+                    embed = discord.Embed(title="**Jake the Dog**",
+                                          description="Heyo!",
+                                          color=discord.Color.purple())
+                    embed.add_field(
+                        name="My default prefix is '>''",
+                        value="You can change my prefix with the `>setprefix <prefix>`",
+                        inline=False)
+                    await channel.send(embed=embed)
+                    inv = await channel.create_invite()
+                    break
     global count
-    count = sum(
-        member.status != discord.Status.offline for member in guild.members
-    )
-
+    count = 0
+    for member in guild.members:
+      if member.status != discord.Status.offline:
+        count +=1
     await send_join(guild, inv)
 
 

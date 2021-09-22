@@ -1,13 +1,10 @@
-import asyncio
-import time
-
 import discord
 from discord.ext import commands
-from discord_slash.context import ComponentContext
+import asyncio
+from discord_slash.utils.manage_components import create_button, create_actionrow, wait_for_component
+import time
 from discord_slash.model import ButtonStyle
-from discord_slash.utils.manage_components import (create_actionrow,
-                                                   create_button,
-                                                   wait_for_component)
+from discord_slash.context import ComponentContext
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)

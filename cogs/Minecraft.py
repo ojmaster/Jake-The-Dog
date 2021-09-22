@@ -1,12 +1,12 @@
-import json
-
 import discord
-import requests
 from discord.ext import commands
-from discord_slash import SlashContext, cog_ext
 from discord_slash.utils.manage_commands import create_option
-from mcstatus import MinecraftServer
 from mojang import MojangAPI
+import requests
+import json
+from mcstatus import MinecraftServer
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -61,9 +61,11 @@ class Minecraft(commands.Cog):
     async def namehistory(self, player):
         name_history = MojangAPI.get_name_history(player)
         npf = MojangAPI.get_profile(player)
+        names = []
         nm = ""
         x = 0
-        names = ["`" + data['name'] + "`" for data in name_history]
+        for data in name_history:
+            names.append("`" + data['name'] + "`")
         names = "\n".join(names)
         return names
 

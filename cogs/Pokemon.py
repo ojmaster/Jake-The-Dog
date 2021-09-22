@@ -1,19 +1,15 @@
-import asyncio
-import difflib
-import json
-import os
-import urllib.request
-
 import discord
-import pokepy
-import pypokedex
-import requests
 from discord.ext import commands
 from discord.ext.commands.errors import TooManyArguments
-from discord_slash import SlashContext, cog_ext
-from discord_slash.model import ButtonStyle
-from discord_slash.utils.manage_commands import create_choice, create_option
+import pypokedex
+import urllib.request
 from PIL import Image, ImageSequence
+import os, requests, json, difflib
+import pokepy
+from discord_slash.model import ButtonStyle
+from discord_slash import cog_ext, SlashContext
+from discord_slash.utils.manage_commands import create_option, create_choice
+import asyncio
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix='!', intents=intents)
@@ -257,11 +253,12 @@ class Pokemon(commands.Cog):
 
   async def pokename(self, pokemon):
     if any(map(str.isdigit, pokemon)):
-      pk = pykemon.get_pokemon_species(pokemon)
-      return pk.name.capitalize()
+        pk = pykemon.get_pokemon_species(pokemon)
+        name = pk.name.capitalize()
     else: 
-      pk = await self.pknamecheck(pokemon)
-      return pk.capitalize()
+        pk = await self.pknamecheck(pokemon)
+        name = pk.capitalize()
+    return name
 
   async def pdatadesc(self, pokemon):
         pdesc = "__**#"
@@ -274,7 +271,8 @@ class Pokemon(commands.Cog):
 
   async def pspecies(self, pokemon):
     pk = pykemon.get_pokemon_species(pokemon)
-    return pk.genera[7].genus
+    species = pk.genera[7].genus
+    return species
 
 
   async def entry(self, pokemon):
@@ -287,9 +285,11 @@ class Pokemon(commands.Cog):
         entry = flavor.flavor_text
     entry = entry.replace("\n", " ")
     entry = entry.split()
-    for i in range(6, len(entry), 6):
+    i = 6
+    while i < len(entry):
       entry.insert(i, "\n")
-    entry = ' '.join(str(elem) for elem in entry)
+      i += 6
+    entry = ' '.join([str(elem) for elem in entry])
     return entry
       
 
@@ -343,20 +343,27 @@ class Pokemon(commands.Cog):
   async def iname(self, name):
     if any(map(str.isdigit, name)):
         pit = pykemon.get_item(name)
-        return pit.name.replace("-", " ").title()
+        name = pit.name.replace("-", " ").title()
     else:
         name = await self.namecheck(name)
-        return name.replace("-", " ").title()
+        name = name.replace("-", " ").title()
+    return name
 
   async def iid(self, id):
     pit = pykemon.get_item(id)
-    return str(pit.id)
+    pid = str(pit.id)
+    return pid
 
   async def icat(self, category):
-    return pykemon.get_item(category).category.name.title()
+    pit = pykemon.get_item(category)
+    category = pit.category.name.title()
+    return category
 
   async def ieffect(self, effect):
-    return pykemon.get_item(effect).effect_entries[0].effect.replace("\n", " ")
+    pit = pykemon.get_item(effect)
+    effect = pit.effect_entries[0].effect
+    effect = effect.replace("\n", " ")
+    return effect
 
   async def iflvtxt(self, flvtxt):
     pit = pykemon.get_item(flvtxt)
@@ -409,21 +416,33 @@ class Pokemon(commands.Cog):
       return 'sword'
 
   async def region(self, gen):
-    return pykemon.get_generation(await self.gen(pykemon.get_pokemon_species(gen).generation.name)).main_region.name.capitalize()
+    poke = pykemon.get_pokemon_species(gen).generation.name
+    poke = await self.gen(poke)
+    reg = pykemon.get_generation(poke)
+    return reg.main_region.name.capitalize()
+
 
   async def namecheck(self, iitem):
+    lst = []
     items = requests.get('https://pokeapi.co/api/v2/item/?limit=1005')
     item = items.json()
     item = item['results']
-    lst = [name['name'] for name in item]
-    return difflib.get_close_matches(iitem, lst)[0]
+    for name in item:
+        lst.append(name['name'])
+    checkitem = difflib.get_close_matches(iitem, lst)
+    checkitem = checkitem[0]
+    return checkitem
 
   async def pknamecheck(self, pokemon):
+    lst = []
     pokemons = requests.get('https://pokeapi.co/api/v2/pokemon/?limit=898')
     pkm = pokemons.json()
     pkm = pkm['results']
-    lst = [name['name'] for name in pkm]
-    return difflib.get_close_matches(pokemon, lst)[0]
+    for name in pkm:
+        lst.append(name['name'])
+    checkpk = difflib.get_close_matches(pokemon, lst)
+    checkpk = checkpk[0]
+    return checkpk
 
   async def pability(self, pokemon):
     pklink = f'https://pokeapi.co/api/v2/pokemon/{pokemon}'
