@@ -20,7 +20,7 @@ def get_prefix(bot, message):
       return commands.when_mentioned_or(">")(bot, message)
     return prefixes[str(message.guild.id)]
 
-intents = discord.Intents().all()
+intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
 client = discord.Client()
 slash = SlashCommand(bot, sync_commands=True) 
@@ -45,7 +45,6 @@ async def presence():
 
 @bot.event
 async def on_ready():
-    print(discord.__version__)
     print('------')
     print('Logged in as')
     print(bot.user.name)

@@ -1,7 +1,9 @@
-import discord
-from discord.ext import commands
-from discord.errors import Forbidden
 import json
+
+import discord
+from discord.errors import Forbidden
+from discord.ext import commands
+
 
 def get_prefix(bot, message):
   with open('prefixes.json', 'r') as pr:
@@ -53,7 +55,7 @@ class Help(commands.Cog):
     
     @commands.command()
     # @commands.bot_has_permissions(add_reactions=True,embed_links=True)
-    async def help(self, ctx, *input):
+    async def help(self, ctx, *input):  # sourcery no-metrics skip: inline-variable, move-assign, remove-redundant-fstring, simplify-fstring-formatting, use-join
         """Shows all modules of that bot"""
 	# !SET THOSE VARIABLES TO MAKE THE COG FUNCTIONAL!
         prefix = get_prefix(self.bot, ctx.message)
