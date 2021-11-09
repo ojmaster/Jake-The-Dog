@@ -87,8 +87,7 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Music update", value="Bot now properly reads Youtube, Soundcloud, Spotify (although still very buggy), and a host of other players.", inline=True)
-    embed.add_field(name = "Removed commands from `Fun`", value = "Some smaller unused commands were removed and hopefully will be replaced with newer better commands in the future!", inline = False)
+    embed.add_field(name="More VCGames!!!", value="There are now more VCGames that have been added along with a new way to select them! Try out the `/activities` command!", inline=True)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):
