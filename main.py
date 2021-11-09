@@ -1,13 +1,12 @@
 import discord
-import time
 from discord.ext import commands, tasks
-import json
+import json, os
 from configparser import ConfigParser
-import os
 import random
 from discord_slash.context import MenuContext
 from discord_slash.model import ContextMenuType
 from discord_slash import SlashCommand
+import asyncio
 
 config = ConfigParser()
 config.read('./config/options.ini')
@@ -89,7 +88,7 @@ async def on_guild_join(guild):
             )
             and channel.permissions_for(guild.me).send_messages
         ):
-            time.sleep(0.1)
+            asyncio.sleep(0.1)
             embed = discord.Embed(title="**Jake the Dog**",
                                   description="Heyo!",
                                   color=discord.Color.purple())
@@ -107,7 +106,7 @@ async def on_guild_join(guild):
                 channel.type is discord.ChannelType.text
                 and channel.permissions_for(guild.me).send_messages
             ):
-                time.sleep(0.1)
+                asyncio.sleep(0.1)
                 embed = discord.Embed(title="**Jake the Dog**",
                                       description="Heyo!",
                                       color=discord.Color.purple())
@@ -127,23 +126,23 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_guild_remove(guild):
-  msg = bot.get_channel(837556075305500672)
-  embed = discord.Embed(title = "**Left Guild**", color=discord.Color.blurple())
-  embed.add_field(name = "__Name__", value = str(guild.name))
-  embed.add_field(name = "__ID__", value = str(guild.id))
-  embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
-  embed.add_field(name = "__Members__", value = str(guild.member_count))
-  count = 0
-  for member in guild.members:
-    if member.status != discord.Status.offline:
-      count +=1
-  embed.add_field(name = "__Online__", value = str(count))
-  embed.set_thumbnail(url = str(guild.icon_url))
-  await msg.send(embed = embed)
-  with open('prefixes.json', 'r') as pr:
-      prefixes = json.load(pr)
-  with open('prefixes.json', 'w') as pr:
-      json.dump(prefixes, pr, indent=4)
+    msg = bot.get_channel(837556075305500672)
+    embed = discord.Embed(title = "**Left Guild**", color=discord.Color.blurple())
+    embed.add_field(name = "__Name__", value = str(guild.name))
+    embed.add_field(name = "__ID__", value = str(guild.id))
+    embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
+    embed.add_field(name = "__Members__", value = str(guild.member_count))
+    count = sum(
+        member.status != discord.Status.offline for member in guild.members
+    )
+
+    embed.add_field(name = "__Online__", value = str(count))
+    embed.set_thumbnail(url = str(guild.icon_url))
+    await msg.send(embed = embed)
+    with open('prefixes.json', 'r') as pr:
+        prefixes = json.load(pr)
+    with open('prefixes.json', 'w') as pr:
+        json.dump(prefixes, pr, indent=4)
 
 
 async def send_join(guild, invite):
@@ -160,10 +159,10 @@ async def send_join(guild, invite):
 
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.py'):
+    if filename.endswith('.py') and not filename.startswith('Owner'):
         bot.load_extension(f'cogs.{filename[:-3]}')
         print(f'cogs.{filename[:-3]}')
-bot.unload_extension('cogs.Owner')
+
 
 @bot.command(name = "serverlist", 
             description = "All servers bot is in", 
