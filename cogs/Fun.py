@@ -4,9 +4,7 @@ import random
 from logging import error
 from typing import Union
 
-import aiohttp
 import discord
-from discord import guild
 from discord.ext import commands
 from discord_slash import SlashContext, cog_ext
 from discord_slash.context import ComponentContext, MenuContext
@@ -78,7 +76,7 @@ class Fun(commands.Cog):
             option_type=3,
             required=True
         )
-    ])
+    ]   )
     async def slasheightball(self, ctx: SlashContext, question: str):
         data = json.load(
             open('./config/choices.json', encoding="utf8", errors='ignore'))

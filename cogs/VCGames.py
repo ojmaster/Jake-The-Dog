@@ -8,7 +8,7 @@ from discord_slash import SlashContext, cog_ext
 from discord_slash.context import ComponentContext
 from discord_slash.model import ButtonStyle
 from discord_slash.utils.manage_components import (create_actionrow,
-                                                   create_button,
+                                                   create_select, create_select_option,
                                                    wait_for_component)
 
 
@@ -32,11 +32,13 @@ class VCGames(commands.Cog):
         """
         The base command for all VC games
         """
-        buttons = []
-        for k, _i in self.known_activities.items():
-            buttons.append(create_button(style=ButtonStyle.blue, label=f'{k}', custom_id=f'{k}'))
-        action_row = create_actionrow(*buttons)
 
+        options = [
+            create_select_option(label=f'{k}', value=f'{k}')
+            for k, _i in self.known_activities.items()
+        ]
+        
+        action_row = create_actionrow(create_select(options, placeholder = "Choose a Game", min_values = 1, max_values = 1))
         m = await ctx.send(
             content="Here are your choices.", components=[action_row]
         )
@@ -57,7 +59,7 @@ class VCGames(commands.Cog):
             payload = {
                 "max_age": 60,
                 "target_type": 2,
-                "target_application_id": self.known_activities[res.component_id],
+                "target_application_id": self.known_activities[res.selected_options[0]],
             }
 
             try:
@@ -67,7 +69,7 @@ class VCGames(commands.Cog):
                 return await ctx.send(
                     content="I Need the `Create Invite` permission."
                 )
-            
+
             await ctx.send(
                 embed=discord.Embed(
                     description=f"[Click here!](https://discord.gg/{code})\nLink expires in 1 minute",
