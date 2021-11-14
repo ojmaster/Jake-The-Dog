@@ -9,4 +9,8 @@ make a options.ini file, the contents of the file should look like this:
 ```
 [Bot_Config]
 TOKEN = YOUR TOKEN HERE
+
+[Spotify_Configuration]
+SpotipyClientID = 
+SpotipyClientSecret = 
 ```
