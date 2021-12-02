@@ -5,7 +5,12 @@ you'll have to install pokepy with no dependencies otherwise there will be confl
 ```
 pip install pokepy --no-deps
 ```
-make a .env file, the contents of the file should look like this:
+make a options.ini file, the contents of the file should look like this:
 ```
-TOKEN = 'YOUR TOKEN HERE'
+[Bot_Config]
+TOKEN = YOUR TOKEN HERE
+
+[Spotify_Configuration]
+SpotipyClientID = 
+SpotipyClientSecret = 
 ```
