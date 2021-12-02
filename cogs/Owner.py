@@ -35,12 +35,12 @@ class Owner(commands.Cog):
       embed.add_field(name = "Playing", value = ":four:", inline = True)
       embed.add_field(name = "Competing", value = ":five:")
       buttons = [
-                      create_button(style = ButtonStyle.gray, label = "Watching", custom_id = "watching"), 
-                      create_button(style = ButtonStyle.green, label = "Listening", custom_id = "listening"),
-                      create_button(style = ButtonStyle.blue, label = "Streaming", custom_id = "streaming"),
-                      create_button(style = ButtonStyle.red, label = "Playing", custom_id = "playing"),
-                      create_button(style = ButtonStyle.gray, label = "Competing", custom_id = "competing")
-                  ]
+                  create_button(style = ButtonStyle.gray, label = "Watching", custom_id = "watching"), 
+                  create_button(style = ButtonStyle.green, label = "Listening", custom_id = "listening"),
+                  create_button(style = ButtonStyle.blue, label = "Streaming", custom_id = "streaming"),
+                  create_button(style = ButtonStyle.red, label = "Playing", custom_id = "playing"),
+                  create_button(style = ButtonStyle.gray, label = "Competing", custom_id = "competing")
+                ]
       action_row = create_actionrow(*buttons)
       msg = await ctx.send(embed = embed, components = [action_row])
 

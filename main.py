@@ -71,7 +71,7 @@ global count
 @bot.event
 async def on_guild_join(guild):
     with open('prefixes.json', 'r') as pr:
-        prefixes = json.load(pr)
+        prefixes = json.load(pr) 
     prefixes[str(guild.id)] = '>'
     with open('prefixes.json', 'w') as pr:
         json.dump(prefixes, pr, indent=4)
@@ -88,7 +88,7 @@ async def on_guild_join(guild):
             )
             and channel.permissions_for(guild.me).send_messages
         ):
-            asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
             embed = discord.Embed(title="**Jake the Dog**",
                                   description="Heyo!",
                                   color=discord.Color.purple())
@@ -106,7 +106,7 @@ async def on_guild_join(guild):
                 channel.type is discord.ChannelType.text
                 and channel.permissions_for(guild.me).send_messages
             ):
-                asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
                 embed = discord.Embed(title="**Jake the Dog**",
                                       description="Heyo!",
                                       color=discord.Color.purple())
