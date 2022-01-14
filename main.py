@@ -3,8 +3,6 @@ from discord.ext import commands, tasks
 import json, os
 from configparser import ConfigParser
 import random
-from discord_slash.context import MenuContext
-from discord_slash.model import ContextMenuType
 from discord_slash import SlashCommand
 import asyncio
 
@@ -121,41 +119,14 @@ async def on_guild_join(guild):
     count = sum(
         member.status != discord.Status.offline for member in guild.members
     )
-    await send_join(guild, inv)
 
 
 @bot.event
 async def on_guild_remove(guild):
-    msg = bot.get_channel(837556075305500672)
-    embed = discord.Embed(title = "**Left Guild**", color=discord.Color.blurple())
-    embed.add_field(name = "__Name__", value = str(guild.name))
-    embed.add_field(name = "__ID__", value = str(guild.id))
-    embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
-    embed.add_field(name = "__Members__", value = str(guild.member_count))
-    count = sum(
-        member.status != discord.Status.offline for member in guild.members
-    )
-
-    embed.add_field(name = "__Online__", value = str(count))
-    embed.set_thumbnail(url = str(guild.icon_url))
-    await msg.send(embed = embed)
     with open('prefixes.json', 'r') as pr:
         prefixes = json.load(pr)
     with open('prefixes.json', 'w') as pr:
         json.dump(prefixes, pr, indent=4)
-
-
-async def send_join(guild, invite):
-    msg = bot.get_channel(837555246691254346)
-    embed = discord.Embed(title = "**Joined New Guild**", color=discord.Color.blurple())
-    embed.add_field(name = "__Name__", value = str(guild.name))
-    embed.add_field(name = "__ID__", value = str(guild.id))
-    embed.add_field(name = "__Guild Owner__", value = str(guild.owner))
-    embed.add_field(name = "__Members__", value = str(guild.member_count))
-    embed.add_field(name = "__Online__", value = str(count))
-    embed.add_field(name = "__Invite__", value = str(invite))
-    embed.set_thumbnail(url = str(guild.icon_url))
-    await msg.send(embed = embed)
 
 
 for filename in os.listdir('./cogs'):
@@ -169,10 +140,10 @@ for filename in os.listdir('./cogs'):
             hidden = True)
 async def servers(ctx):
   if ctx.author == bot.appinfo.owner:
-      embed = discord.Embed(title = "**Server List**", color = discord.Color.red())
+      count = 0
       for guild in bot.guilds:
-        srvid = guild.id
-        embed.add_field(name = f'__{guild.name}__', value = f'Member Count: {guild.member_count}\nID: {srvid}', inline = True)
+        count += 1
+      embed = discord.Embed(title = "**Server Count**", description = count, color = discord.Color.red())
       await ctx.reply(embed = embed)
   else:
     ctx.reply("Only available to Bot Owner")
