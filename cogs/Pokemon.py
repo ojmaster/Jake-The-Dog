@@ -39,29 +39,29 @@ class Pokemon(commands.Cog):
     await Pokemon.pokemoncmd(self, ctx, poke, pimg)
 
   @cog_ext.cog_slash(name = "Pokedex", description= "Search up a pokemon", options = [
-                                                                                      create_option(
-                                                                                        name = "pokemon",
-                                                                                        description = "Pokemon to search",
-                                                                                        option_type = 3,
-                                                                                        required = True
-                                                                                      ),
-                                                                                      create_option(
-                                                                                        name = "sprite",
-                                                                                        description = "Back sprite (Leave empty for Front)",
-                                                                                        option_type = 3,
-                                                                                        required = False,
-                                                                                        choices = [
-                                                                                          create_choice(
-                                                                                            name = "front",
-                                                                                            value = "front"
-                                                                                          ),
-                                                                                          create_choice(
-                                                                                            name = "back",
-                                                                                            value = "back"
-                                                                                          )
-                                                                                        ]
-                                                                                      )
-                                                                                    ])
+      create_option(
+        name = "pokemon",
+        description = "Pokemon to search",
+        option_type = 3,
+        required = True
+      ),
+      create_option(
+        name = "sprite",
+        description = "Back sprite (Leave empty for Front)",
+        option_type = 3,
+        required = False,
+        choices = [
+          create_choice(
+            name = "front",
+            value = "front"
+          ),
+          create_choice(
+            name = "back",
+            value = "back"
+          )
+        ]
+      )
+    ])
   async def slashpokemon(self, ctx: SlashContext, pokemon: str, sprite: str = None):
     await Pokemon.pokemoncmd(self, ctx, pokemon, sprite)
 
@@ -102,29 +102,29 @@ class Pokemon(commands.Cog):
     await Pokemon.shinycmd(self, ctx, poke, pimg)
 
   @cog_ext.cog_slash(name = "ShinyPokedex", description= "Search up a shiny pokemon", options = [
-                                                                                                  create_option(
-                                                                                                    name = "pokemon",
-                                                                                                    description = "Pokemon to search",
-                                                                                                    option_type = 3,
-                                                                                                    required = True
-                                                                                                  ),
-                                                                                                  create_option(
-                                                                                                    name = "sprite",
-                                                                                                    description = "Back sprite (Leave empty for Front)",
-                                                                                                    option_type = 3,
-                                                                                                    required = False,
-                                                                                                    choices = [
-                                                                                                      create_choice(
-                                                                                                        name = "front",
-                                                                                                        value = "front"
-                                                                                                      ),
-                                                                                                      create_choice(
-                                                                                                        name = "back",
-                                                                                                        value = "back"
-                                                                                                      )
-                                                                                                    ]
-                                                                                                  )
-                                                                                                ])
+      create_option(
+        name = "pokemon",
+        description = "Pokemon to search",
+        option_type = 3,
+        required = True
+      ),
+      create_option(
+        name = "sprite",
+        description = "Back sprite (Leave empty for Front)",
+        option_type = 3,
+        required = False,
+        choices = [
+          create_choice(
+            name = "front",
+            value = "front"
+          ),
+          create_choice(
+            name = "back",
+            value = "back"
+          )
+        ]
+      )
+    ])
   async def slashshiny(self, ctx: SlashContext, pokemon: str, sprite: str = None):
     await Pokemon.shinycmd(self, ctx, pokemon, sprite)
 
@@ -165,13 +165,13 @@ class Pokemon(commands.Cog):
     await Pokemon.pitemcmd(self, ctx, item)
 
   @cog_ext.cog_slash(name = "PokeItem", description = "Search up any pokemon item", options = [
-                                                                                                create_option(
-                                                                                                  name = "item",
-                                                                                                  description = "Item to search",
-                                                                                                  option_type= 3,
-                                                                                                  required = True
-                                                                                                )
-                                                                                              ])
+      create_option(
+        name = "item",
+        description = "Item to search",
+        option_type= 3,
+        required = True
+      )
+    ])
   async def slashpitem(self, ctx: SlashContext, item):
     await Pokemon.pitemcmd(self, ctx, item)
 
@@ -200,13 +200,13 @@ class Pokemon(commands.Cog):
     await Pokemon.pdatacmd(self, ctx, pokemon)
 
   @cog_ext.cog_slash(name = "PokeData", description = "In-Depth data of a Pokemon", options = [
-                                                                                              create_option(
-                                                                                                name = "pokemon",
-                                                                                                description = "Pokemon to search",
-                                                                                                option_type = 3,
-                                                                                                required = True  
-                                                                                              )
-                                                                                            ])
+      create_option(
+        name = "pokemon",
+        description = "Pokemon to search",
+        option_type = 3,
+        required = True  
+      )
+    ])
   async def slashpdata(self, ctx: SlashContext, pokemon):
     await Pokemon.pdatacmd(self, ctx, pokemon)
 

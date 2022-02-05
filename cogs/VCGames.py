@@ -70,12 +70,7 @@ class VCGames(commands.Cog):
                     content="I Need the `Create Invite` permission."
                 )
 
-            await ctx.send(
-                embed=discord.Embed(
-                    description=f"[Click here!](https://discord.gg/{code})\nLink expires in 1 minute",
-                    color=discord.Colour.red(),
-                )
-            )
+            await ctx.send(f"Click the link to start\nhttps://discord.gg/{code}")
 
         except asyncio.TimeoutError:
             embed = discord.Embed(title = 'Took too long to respond', color = discord.Color.dark_red())
