@@ -451,41 +451,41 @@ class Pokemon(commands.Cog):
 
   async def typeicon(self, type):
     if type == 'Water':
-        return "<:water_type:847958750400217098>"
+        return "<:water:946555702032367616>"
     elif type == 'Steel':
-        return "<:steel_type:847958750383439882>"
+        return "<:steel:946555701977825290>"
     elif type == 'Rock':
-        return "<:rock_type:847958750307942400>"
+        return "<:rock_type:946555701965250630>"
     elif type == 'Psychic':
-        return "<:psychic_type:847958750350671932>"
+        return "<:psychic:946555701814239233>"
     elif type == 'Poison':
-        return "<:poison_type:847958750383571024>"
+        return "<:poison:946555702078505030>"
     elif type == 'Normal':
-        return "<:normal_type:847958750294966283>"
+        return "<:normal:946555701742952509>"
     elif type == 'Ice':
-        return "<:ice_type:847958750228774932>"
+        return "<:ice:946555701608734721>"
     elif type == 'Ground':
-        return "<:ground_type:847958750231920647>"
+        return "<:ground:946555701805850624>"
     elif type == 'Grass':
-        return "<:grass_type:847958750341234718>"
+        return "<:grass:946555702011375647>"
     elif type == 'Ghost':
-        return "<:ghost_type:847958750321049620>"
+        return "<:ghost:946555701780676668>"
     elif type == 'Flying':
-        return "<:flying_type:847958750249222174>"
+        return "<:flying:946555701424177173>"
     elif type == 'Fire':
-        return "<:fire_type:847958750072930325>"
+        return "<:fire:946555701797457920>"
     elif type == 'Fighting':
-        return "<:fighting_type:847958750245683200>"
+        return "<:fighting:946555701638094899>"
     elif type == 'Electric':
-        return "<:electric_type:847958750207541310>"
+        return "<:electric:946555701789077514>"
     elif type == 'Dragon':
-        return "<:dragon_type:847958750123655188>"
+        return "<:dragon:946555702133010482>"
     elif type == 'Bug':
-        return "<:bug_type:847958749679583252>"
+        return "<:bug:946555689613021244>"
     elif type == 'Fairy':
-        return "<:fairy_type:847958750253285436>"
+        return "<:fairy:946555701663252553>"
     elif type == 'Dark':
-        return "<:dark_type:847958749862821888>"
+        return "<:dark:946555693387907072>"
     
   async def pev(self, pokemon):
     stats = pykemon.get_pokemon(pokemon).stats

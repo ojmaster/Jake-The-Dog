@@ -87,20 +87,20 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="More VCGames!!!", value="There are now more VCGames that have been added along with a new way to select them! Try out the `/activities` command!", inline=True)
+    embed.add_field(name="Bot Verified!!", value="Jake the Dog has officially been verified, thank you to everyone who has supported the bot along the way. Can't wait to see what the future holds. :)", inline=True)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):
-      embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
-      buttons = [
-            create_button(
-              style = ButtonStyle.URL, 
-              label = "Invite Link", 
-              url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2095938794424&scope=bot%20applications.commands"
-            )
-      ]
-      action_row = create_actionrow(*buttons)
-      await ctx.send(embed = embed, components = [action_row])
+    embed = discord.Embed(title = "Invite me to your server!", color = discord.Color.from_rgb(236, 180, 61))
+    buttons = [
+          create_button(
+            style = ButtonStyle.URL, 
+            label = "Invite Link", 
+            url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2095938794424&scope=bot%20applications.commands"
+          )
+    ]
+    action_row = create_actionrow(*buttons)
+    await ctx.send(embed = embed, components = [action_row])
 
   @commands.command()
   async def invite(self, ctx):
