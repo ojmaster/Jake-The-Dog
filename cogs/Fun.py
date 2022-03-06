@@ -28,17 +28,17 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def r34(self, ctx):
+    async def _bonk(self, ctx):
         await ctx.send('https://rb.gy/tkbdmz')
 
-    @cog_ext.cog_slash(name="Rule34")
-    async def rule34cm(self, ctx: SlashContext):
-        await Fun.r34(self, ctx)
+    @cog_ext.cog_slash(name="Bonk")
+    async def bonkcm(self, ctx: SlashContext):
+        await Fun._bonk(self, ctx)
 
-    @commands.command(name="rule34")
-    async def rule34(self, ctx):
+    @commands.command(name="bonk")
+    async def bonk(self, ctx):
         """Horny Time"""
-        await Fun.r34(self, ctx)
+        await Fun._bonk(self, ctx)
 
     async def slotcmd(self, ctx):
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
