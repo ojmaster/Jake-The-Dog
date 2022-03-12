@@ -1,6 +1,6 @@
 import json
 import time
-
+import sqlite3
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions
@@ -67,13 +67,15 @@ class Utility(commands.Cog):
   @has_permissions(manage_guild = True)
   async def setprefix(self, ctx, prefix):
     """Sets bot prefix for server"""
-    with open('prefixes.json', 'r') as pr:
-      prefixes = json.load(pr)
-    prefixes[str(ctx.guild.id)] = prefix
-    with open('prefixes.json', 'w') as pr:
-      json.dump(prefixes, pr, indent = 4)
-    await ctx.send(f'Prefix changed to: {prefix}')
-    return prefix
+    try:
+      conn = sqlite3.connect('config/prefixes.sqlite')
+      c = conn.cursor()
+      c.execute("UPDATE prefixes SET prefix = ? WHERE guild= ?", (prefix, ctx.guild.id))
+      conn.commit()
+      conn.close()
+      await ctx.send(f'Prefix changed to: {prefix}')
+    except:
+      await ctx.send('Something went wrong!')
 
   @commands.command(hidden=True)
   async def dm(self, ctx, member: discord.Member, *, content):

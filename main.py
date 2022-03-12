@@ -1,3 +1,4 @@
+import sqlite3
 import discord
 from discord.ext import commands, tasks
 import json, os
@@ -11,11 +12,14 @@ config.read('./config/options.ini')
 TOKEN = config.get('Bot_Config', 'TOKEN')
 
 def get_prefix(bot, message):
-    with open('prefixes.json', 'r') as pr:
-      prefixes = json.load(pr)
     if not message.guild:
       return commands.when_mentioned_or(">")(bot, message)
-    return prefixes[str(message.guild.id)]
+    conn = sqlite3.connect('config/prefixes.sqlite')
+    c = conn.cursor()
+    c.execute("SELECT prefix FROM prefixes WHERE guild = ?", (message.guild.id,))
+    prefix = c.fetchone()[0]
+    conn.close()
+    return prefix
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
@@ -68,11 +72,11 @@ global count
 
 @bot.event
 async def on_guild_join(guild):
-    with open('prefixes.json', 'r') as pr:
-        prefixes = json.load(pr) 
-    prefixes[str(guild.id)] = '>'
-    with open('prefixes.json', 'w') as pr:
-        json.dump(prefixes, pr, indent=4)
+    conn = sqlite3.connect('config/prefixes.sqlite')
+    c = conn.cursor()
+    c.execute("INSERT INTO prefixes VALUES (?, ?)", (guild.id, ">"))
+    conn.commit()
+    conn.close()
     bs = False
     global inv
     for channel in guild.channels:
@@ -123,10 +127,11 @@ async def on_guild_join(guild):
 
 @bot.event
 async def on_guild_remove(guild):
-    with open('prefixes.json', 'r') as pr:
-        prefixes = json.load(pr)
-    with open('prefixes.json', 'w') as pr:
-        json.dump(prefixes, pr, indent=4)
+    conn = sqlite3.connect('config/prefixes.sqlite')
+    c = conn.cursor()
+    c.execute("DELETE FROM prefixes WHERE guild = ?", (guild.id,))
+    conn.commit()
+    conn.close()
 
 
 for filename in os.listdir('./cogs'):
