@@ -1,17 +1,10 @@
 import json
-
+from pathlib import Path
+Path(Path.cwd()).parent
 import discord
 from discord.errors import Forbidden
 from discord.ext import commands
-
-
-def get_prefix(bot, message):
-  with open('prefixes.json', 'r') as pr:
-    prefixes = json.load(pr)
-  return prefixes[str(message.guild.id)]
-
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+from main import get_prefix
 
 """This custom help command is a perfect replacement for the default one on any Discord Bot written in Discord.py!
 However, you must put "bot.remove_command('help')" in your bot, and the command must be in a cog for it to work.
@@ -62,7 +55,7 @@ class Help(commands.Cog):
         version =  'v1.0'
         name = "Jake The Dog"
         # setting owner name - if you don't wanna be mentioned remove line 49-60 and adjust help text (line 88) 
-        owner = 	'ojmaster#7182'
+        owner = 'ojmaster#7182'
 
         # checks if cog parameter was given
         # if not: sending all modules and commands not associated with a cog
@@ -75,9 +68,14 @@ class Help(commands.Cog):
                 owner = owner
 
             # starting to build embed
-            emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
-                                description=f'Use `{prefix}help <module>` to gain more information about that module '
-                                            f':smiley:\n')
+            if not ctx.message.guild:
+                emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
+                                    description=f'Use `>help <module>` to gain more information about that module '
+                                                f':smiley:\n')
+            else:
+                emb = discord.Embed(title='Commands and modules', color=discord.Color.blue(),
+                                    description=f'Use `{prefix}help <module>` to gain more information about that module '
+                                                f':smiley:\n')
 
             # iterating trough cogs, gathering descriptions
             cogs_desc = ''

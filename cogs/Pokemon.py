@@ -542,7 +542,7 @@ class Pokemon(commands.Cog):
 
   async def hatchtime(self, pokemon):
     hatch = pykemon.get_pokemon_species(pokemon).hatch_counter
-    return str(255 * (hatch + 1)) + " Steps"
+    return f'{str(255 * (hatch + 1))} Steps'
 
 def setup(bot):
 	bot.add_cog(Pokemon(bot))

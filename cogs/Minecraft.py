@@ -1,5 +1,3 @@
-import json
-
 import discord
 import requests
 from discord.ext import commands
@@ -7,10 +5,6 @@ from discord_slash import SlashContext, cog_ext
 from discord_slash.utils.manage_commands import create_option
 from mcstatus import MinecraftServer
 from mojang import MojangAPI
-
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='!', intents=intents)
-client = discord.Client()
 
 
 class Minecraft(commands.Cog):
@@ -31,10 +25,10 @@ class Minecraft(commands.Cog):
 
     @cog_ext.cog_slash(name = "McPlayerInfo", description = "Search a Minecraft player", options = [
     create_option(
-        name = "player",
-        description = "Minecraft Player",
-        option_type = 3,
-        required = True
+            name = "player",
+            description = "Minecraft Player",
+            option_type = 3,
+            required = True
         )
     ])
     async def slashmcp(self, ctx: SlashContext, player):
