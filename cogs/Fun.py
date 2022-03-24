@@ -4,6 +4,7 @@ import random
 from logging import error
 from typing import Union
 
+from urllib.request import urlopen
 import discord
 from discord.ext import commands
 from discord_slash import SlashContext, cog_ext
@@ -31,14 +32,20 @@ class Fun(commands.Cog):
     async def _bonk(self, ctx):
         await ctx.send('https://rb.gy/tkbdmz')
 
-    @cog_ext.cog_slash(name="Bonk")
-    async def bonkcm(self, ctx: SlashContext):
-        """Bonk ur bad"""
-        await Fun._bonk(self, ctx)
+    @cog_ext.cog_slash(name="Bonk", description="Get Bonked", options=[
+        create_option(
+            name="user",
+            description="Who we bonking?",
+            option_type=6,
+            required=False
+        )
+    ])
+    async def bonkcm(self, ctx: SlashContext, user=""):
+        await Fun._bonk(self, ctx, user)
 
     @commands.command(name="bonk")
     async def bonk(self, ctx):
-        """Bonk ur bad"""
+        """Horny Time"""
         await Fun._bonk(self, ctx)
 
     async def slotcmd(self, ctx):
@@ -162,12 +169,12 @@ class Fun(commands.Cog):
         timer = '{:02d}:{:02d}'.format(mins, sec)
         count = await ctx.send(f"`{timer}`")
         while number >= 0:
-            await count.edit(content = f"`{timer}`")
             mins, sec = divmod(number, 60)
             timer = '{:02d}:{:02d}'.format(mins, sec)
+            await count.edit(content = f"`{timer}`")
             await asyncio.sleep(1)
             number -= 1
-        await ctx.send(f"{ctx.author.mention}\n**DING DING DING :alarm_clock:**")
+        await ctx.reply(f"{ctx.author.mention}\n**DING DING DING :alarm_clock:**")
 
     @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="RIP")
     async def ripcm(self, ctx: MenuContext):
@@ -199,9 +206,10 @@ class Fun(commands.Cog):
         data = json.load(
             open('./config/choices.json', encoding="utf8", errors='ignore'))
         emojis = ['😆', '😄', '😂', '😭', '🤣']
-        puns = [v for d in data['pun'] for k, v in d.items()]
-        msg = f'{random.choice(puns)}'
-        pn = await ctx.send(msg)
+        url = "https://raw.githubusercontent.com/dabbers/OPun/main/data.json"
+        response = urlopen(url)
+        data_json = json.loads(response.read())["data"]["posts"]
+        pn = await ctx.send(random.choice(data_json)["plaintext"])
         await pn.add_reaction(random.choice(emojis))
 
     @commands.command(aliases=['joke'])
