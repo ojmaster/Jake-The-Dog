@@ -41,11 +41,12 @@ class Fun(commands.Cog):
         )
     ])
     async def bonkcm(self, ctx: SlashContext, user=""):
+        """Bonk ur bad"""
         await Fun._bonk(self, ctx, user)
 
     @commands.command(name="bonk")
     async def bonk(self, ctx):
-        """Horny Time"""
+        """Bonk ur bad"""
         await Fun._bonk(self, ctx)
 
     async def slotcmd(self, ctx):
