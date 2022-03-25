@@ -80,14 +80,14 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       if pimg == "back":
         await self.bimg(poke)
-        embed.set_image(url="attachment://pokemonb.png")
-        await ctx.send(file = discord.File("pokemonb.png"), embed = embed)
-        os.remove("pokemonb.png")
+        embed.set_image(url=f"attachment://{poke}b.png")
+        await ctx.send(file = discord.File(f"{poke}b.png"), embed = embed)
+        os.remove(f"{poke}b.png")
       else:
         await self.pimg(poke)
-        embed.set_image(url="attachment://pokemonf.png")
-        await ctx.send(file = discord.File("pokemonf.png"), embed = embed)
-        os.remove("pokemonf.png")
+        embed.set_image(url=f"attachment://{poke}.png")
+        await ctx.send(file = discord.File(f"{poke}.png"), embed = embed)
+        os.remove(f"{poke}.png")
     except IndexError:
       embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
       await ctx.send(embed = embed)
@@ -144,14 +144,14 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
       if pimg == "back":
         await self.bsimg(poke)
-        embed.set_image(url="attachment://shinyb.png")
-        await ctx.send(file = discord.File("shinyb.png"), embed = embed)
-        os.remove("shinyb.png")
+        embed.set_image(url=f"attachment://{poke}sb.png")
+        await ctx.send(file = discord.File(f"{poke}sb.png"), embed = embed)
+        os.remove(f"{poke}sb.png")
       else:
         await self.psimg(poke)
-        embed.set_image(url="attachment://shinyf.png")
-        await ctx.send(file = discord.File("shinyf.png"), embed = embed)
-        os.remove("shinyf.png")
+        embed.set_image(url=f"attachment://{poke}sf.png")
+        await ctx.send(file = discord.File(f"{poke}sf.png"), embed = embed)
+        os.remove(f"{poke}sf.png")
     except IndexError:
       embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
       await ctx.send(embed = embed)
@@ -313,32 +313,32 @@ class Pokemon(commands.Cog):
 
   async def pimg(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
-    urllib.request.urlretrieve(pokem.sprites.front.get("default"), "pokemonf.png")
-    img = Image.open("pokemonf.png")
+    urllib.request.urlretrieve(pokem.sprites.front.get("default"), f"{pokem.name}.png")
+    img = Image.open(f"{pokem.name}.png")
     img = img.resize((200,200), Image.ANTIALIAS)
-    img.save("pokemonf.png")
+    img.save(f"{pokem.name}.png")
 
 
   async def psimg(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
-    urllib.request.urlretrieve(pokem.sprites.front.get("shiny"), "shinyf.png")
-    img = Image.open("shinyf.png")
+    urllib.request.urlretrieve(pokem.sprites.front.get("shiny"), f"{pokem.name}sf.png")
+    img = Image.open(f"{pokem.name}sf.png")
     img = img.resize((200,200), Image.ANTIALIAS)
-    img.save("shinyf.png")
+    img.save(f"{pokem.name}sf.png")
   
   async def bimg(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
-    urllib.request.urlretrieve(pokem.sprites.back.get("default"), "pokemonb.png")
-    img = Image.open("pokemonb.png")
+    urllib.request.urlretrieve(pokem.sprites.back.get("default"), f"{pokem.name}b.png")
+    img = Image.open(f"{pokem.name}b.png")
     img = img.resize((200,200), Image.ANTIALIAS)
-    img.save("pokemonb.png")
+    img.save(f"{pokem.name}b.png")
 
   async def bsimg(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
-    urllib.request.urlretrieve(pokem.sprites.back.get("shiny"), "shinyb.png")
-    img = Image.open("shinyb.png")
+    urllib.request.urlretrieve(pokem.sprites.back.get("shiny"), f"{pokem.name}sb.png")
+    img = Image.open(f"{pokem.name}sb.png")
     img = img.resize((200,200), Image.ANTIALIAS)
-    img.save("shinyb.png")
+    img.save(f"{pokem.name}sb.png")
   
   async def iname(self, name):
     if any(map(str.isdigit, name)):

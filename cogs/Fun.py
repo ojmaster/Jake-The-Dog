@@ -29,8 +29,16 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def _bonk(self, ctx):
-        await ctx.send('https://rb.gy/tkbdmz')
+    async def _bonk(self, ctx, user = None):
+        if user is None:
+            embed = discord.Embed(title="", color=discord.Color.dark_blue())
+            embed.set_image(url="https://rb.gy/tkbdmz")
+            embed.set_footer(text=f"Bonk by: {ctx.author.name}")
+        else:
+            embed = discord.Embed(title="", color=discord.Color.dark_blue())
+            embed.set_image(url="https://rb.gy/tkbdmz")
+            embed.set_footer(text=f"Bonk by: {ctx.author.name}")
+        await ctx.send(content = user.mention, embed = embed)
 
     @cog_ext.cog_slash(name="Bonk", description="Get Bonked", options=[
         create_option(
@@ -45,9 +53,9 @@ class Fun(commands.Cog):
         await Fun._bonk(self, ctx, user)
 
     @commands.command(name="bonk")
-    async def bonk(self, ctx):
+    async def bonk(self, ctx, user: discord.User = None):
         """Bonk ur bad"""
-        await Fun._bonk(self, ctx)
+        await Fun._bonk(self, ctx, user)
 
     async def slotcmd(self, ctx):
         emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
