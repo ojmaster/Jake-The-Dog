@@ -72,7 +72,7 @@ class Pokemon(commands.Cog):
       if not any(map(str.isdigit, poke)):
           poke = await self.pknamecheck(poke)
       elif poke.isdigit():
-          poke = await self.pokename(poke)
+          poke = await self.pokename(poke).lower()
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
@@ -138,7 +138,7 @@ class Pokemon(commands.Cog):
       if not any(map(str.isdigit, poke)):
           poke = await self.pknamecheck(poke)
       elif poke.isdigit():
-          poke = await self.pokename(poke)
+          poke = await self.pokename(poke).lower()
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
