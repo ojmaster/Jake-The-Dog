@@ -73,7 +73,11 @@ class Utility(commands.Cog):
       c.execute("UPDATE prefixes SET prefix = ? WHERE guild= ?", (prefix, ctx.guild.id))
       conn.commit()
       conn.close()
-      await ctx.send(f'Prefix changed to: {prefix}')
+      embed = discord.Embed(
+          title=f"Prefix set to {prefix}",
+          color=discord.Color.from_rgb(236, 180, 61),
+      )
+      await ctx.send(embed = embed)
     except:
       await ctx.send('Something went wrong!')
 
@@ -89,7 +93,7 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Bot Verified!!", value="Jake the Dog has officially been verified, thank you to everyone who has supported the bot along the way. Can't wait to see what the future holds. :)", inline=True)
+    embed.add_field(name="Prefixes Reset", value="Unfortunately I messed up and accidentally deleted all the prefixes so I had to reset them, but it shouldn't be much of a problem! All you have to do is `>setprefix <prefix>` to change it to whatever custom prefix you want", inline=True)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):

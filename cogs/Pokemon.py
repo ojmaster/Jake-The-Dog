@@ -71,6 +71,8 @@ class Pokemon(commands.Cog):
       embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
       if not any(map(str.isdigit, poke)):
           poke = await self.pknamecheck(poke)
+      elif poke.isdigit():
+          poke = await self.pokename(poke)
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
@@ -135,6 +137,8 @@ class Pokemon(commands.Cog):
       embed = discord.Embed(title = embedtitle, color = discord.Color.red())
       if not any(map(str.isdigit, poke)):
           poke = await self.pknamecheck(poke)
+      elif poke.isdigit():
+          poke = await self.pokename(poke)
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
@@ -235,15 +239,26 @@ class Pokemon(commands.Cog):
       await ctx.send(embed = embed)
 
   async def pstat(self, pokemon):
-        pstat = pykemon.get_pokemon(pokemon)
-        data = [[str(pstat.stats[0].base_stat), str(pstat.stats[1].base_stat), str(pstat.stats[2].base_stat)], [str(pstat.stats[3].base_stat), str(pstat.stats[4].base_stat), str(pstat.stats[5].base_stat)]]
-        pkst =  "`{: >0} {: >13} {: >13}`\n".format("HP", "Atk", "Def")
-        row = data[0]
-        pkst = pkst + "`{: >0} {: >12} {: >13}`\n".format(*row)
-        pkst += "`{: >0} {: >12} {: >9}`\n".format("Sp. Atk", "Sp. Def", "Spe")
-        row = data[1]
-        pkst = pkst + "`{: >0} {: >12} {: >13}`\n".format(*row)
-        return pkst
+    pstat = pykemon.get_pokemon(pokemon)
+    data = [
+        [
+            str(pstat.stats[0].base_stat),
+            str(pstat.stats[1].base_stat),
+            str(pstat.stats[2].base_stat),
+        ],
+        [
+            str(pstat.stats[3].base_stat),
+            str(pstat.stats[4].base_stat),
+            str(pstat.stats[5].base_stat),
+        ],
+    ]
+    row = data[0]
+    pkst = "`{: >0} {: >13} {: >13}`\n".format(
+        "HP", "Atk", "Def") + "`{: >0} {: >12} {: >13}`\n".format(*row)
+    pkst += "`{: >0} {: >12} {: >9}`\n".format("Sp. Atk", "Sp. Def", "Spe")
+    row = data[1]
+    pkst += "`{: >0} {: >12} {: >13}`\n".format(*row)
+    return pkst
 
   async def ptype(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
