@@ -1,16 +1,23 @@
 # Jake-The-Dog
-My bot i make as i learn more about coding python and learning more of the discord.py API
 
-you'll have to install pokepy with no dependencies otherwise there will be conflicts
-```
-pip install pokepy --no-deps
-```
-make a options.ini file, the contents of the file should look like this:
-```
-[Bot_Config]
-TOKEN = YOUR TOKEN HERE
+## Features
 
-[Spotify_Configuration]
-SpotipyClientID = 
-SpotipyClientSecret = 
+**SQL** database that allows for servers to set a custom prefix
+Accessing different APIs such as:
+```
+[DiscordAPI](https://discord.com/developers/docs/reference)
+[PokeAPI](https://pokeapi.co/docs/v2)
+[MojangAPI](https://wiki.vg/Mojang_API)
+UrbanDictionary
+```
+
+These are all done through the use of different libraries
+```
+discord.py
+pokepy
+mojang
+urbandictionary_top
+mcstatus
+sqlite3
+requests
 ```
