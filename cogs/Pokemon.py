@@ -69,10 +69,7 @@ class Pokemon(commands.Cog):
   async def pokemoncmd(self, ctx, poke, pimg):
     try:
       embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
-      if not any(map(str.isdigit, poke)):
-          poke = await self.pknamecheck(poke)
-      elif poke.isdigit():
-          poke = await self.pokename(poke).lower()
+      poke = str(await self.pokename(poke)).lower()
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
@@ -135,10 +132,7 @@ class Pokemon(commands.Cog):
       stitle = str(await self.pokename(poke))
       embedtitle = f'Shiny {stitle}'
       embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      if not any(map(str.isdigit, poke)):
-          poke = await self.pknamecheck(poke)
-      elif poke.isdigit():
-          poke = await self.pokename(poke).lower()
+      poke = str(await self.pokename(poke)).lower()
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
       embed.add_field(name = "Type", value = await self.ptype(poke))
       embed.add_field(name = "Species", value = await self.pspecies(poke))
