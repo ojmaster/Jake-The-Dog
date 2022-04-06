@@ -102,7 +102,7 @@ class Utility(commands.Cog):
           create_button(
             style = ButtonStyle.URL, 
             label = "Invite Link", 
-            url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=2095938794424&scope=bot%20applications.commands"
+            url = "https://discord.com/api/oauth2/authorize?client_id=811673970004721694&permissions=277062478952&scope=bot%20applications.commands"
           )
     ]
     action_row = create_actionrow(*buttons)
