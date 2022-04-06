@@ -93,7 +93,7 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Prefixes Reset", value="Unfortunately I messed up and accidentally deleted all the prefixes so I had to reset them, but it shouldn't be much of a problem! All you have to do is `>setprefix <prefix>` to change it to whatever custom prefix you want", inline=True)
+    embed.add_field(name="Bug Fixes", value="The `/pokedex (pokemon)` not taking in pokemon ID input has been fixed. \nFixed Invite Link", inline=True)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):
