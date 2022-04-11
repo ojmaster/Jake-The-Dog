@@ -67,7 +67,6 @@ async def listservers():
     for guild in bot.guilds:
         print(" Name: " + str(guild.name) + " || " + "ID: " + str(guild.id))
 
-global count
 
 @bot.event
 async def on_guild_join(guild):
@@ -77,7 +76,13 @@ async def on_guild_join(guild):
     conn.commit()
     conn.close()
     bs = False
-    global inv
+    embed = discord.Embed(title="**Jake the Dog**",
+                          description="Heyo!",
+                          color=discord.Color.purple())
+    embed.add_field(
+        name="My default prefix is '>''",
+        value="You can change my prefix with the `>setprefix <prefix>`",
+        inline=False)
     for channel in guild.channels:
         if (
             channel.type is discord.ChannelType.text
@@ -90,15 +95,7 @@ async def on_guild_join(guild):
             and channel.permissions_for(guild.me).send_messages
         ):
             await asyncio.sleep(0.1)
-            embed = discord.Embed(title="**Jake the Dog**",
-                                  description="Heyo!",
-                                  color=discord.Color.purple())
-            embed.add_field(
-                name="My default prefix is '>''",
-                value="You can change my prefix with the `>setprefix <prefix>`",
-                inline=False)
             await channel.send(embed=embed)
-            inv = await channel.create_invite()
             bs = True
             break
     if not bs:
@@ -108,20 +105,8 @@ async def on_guild_join(guild):
                 and channel.permissions_for(guild.me).send_messages
             ):
                 await asyncio.sleep(0.1)
-                embed = discord.Embed(title="**Jake the Dog**",
-                                      description="Heyo!",
-                                      color=discord.Color.purple())
-                embed.add_field(
-                    name="My default prefix is '>''",
-                    value="You can change my prefix with the `>setprefix <prefix>`",
-                    inline=False)
                 await channel.send(embed=embed)
-                inv = await channel.create_invite()
                 break
-    global count
-    count = sum(
-        member.status != discord.Status.offline for member in guild.members
-    )
 
 
 @bot.event
