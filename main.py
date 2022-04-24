@@ -65,7 +65,7 @@ async def change_stat():
 async def listservers():
     print("Server List:")
     for guild in bot.guilds:
-        print(" Name: " + str(guild.name) + " || " + "ID: " + str(guild.id))
+        print(f" Name: {str(guild.name)} || ID: {str(guild.id)}")
 
 
 @bot.event
@@ -128,14 +128,12 @@ for filename in os.listdir('./cogs'):
             description = "All servers bot is in", 
             hidden = True)
 async def servers(ctx):
-  if ctx.author == bot.appinfo.owner:
-      count = 0
-      for guild in bot.guilds:
-        count += 1
-      embed = discord.Embed(title = "**Server Count**", description = count, color = discord.Color.red())
-      await ctx.reply(embed = embed)
-  else:
-    ctx.reply("Only available to Bot Owner")
+    if ctx.author == bot.appinfo.owner:
+        count = sum(1 for _ in bot.guilds)
+        embed = discord.Embed(title = "**Server Count**", description = count, color = discord.Color.red())
+        await ctx.reply(embed = embed)
+    else:
+        ctx.reply("Only available to Bot Owner")
 
 
 @bot.command(name="reload",
