@@ -1,6 +1,4 @@
-import asyncio
 import difflib
-import json
 import os
 import urllib.request
 
@@ -30,13 +28,16 @@ class Pokemon(commands.Cog):
 
 
   @commands.command(aliases = ["poke"])
-  async def pokemon(self, ctx, poke, pimg = None):
+  async def pokemon(self, ctx, poke, pimg = None, shiny = None):
     """
     Pokeedex entry for Pokemon
     Usage: poke <pokemon> {back} 
     {back} is optional (Defaults to `front` if left empty)
     """
-    await Pokemon.pokemoncmd(self, ctx, poke, pimg)
+    if pimg == "shiny":
+      pimg = None
+      shiny = "shiny"
+    await Pokemon.pokemoncmd(self, ctx, poke, pimg, shiny)
 
   @cog_ext.cog_slash(name = "Pokedex", description= "Search up a pokemon", options = [
       create_option(
@@ -60,13 +61,29 @@ class Pokemon(commands.Cog):
             value = "back"
           )
         ]
+      ),
+      create_option(
+        name = "shiny",
+        description = "Shiny sprite (Leave empty for Normal)",
+        option_type = 3,
+        required = False,
+        choices = [
+          create_choice(
+            name = "shiny",
+            value = "shiny"
+          ),
+          create_choice(
+            name = "normal",
+            value = "normal"
+          )
+        ]
       )
     ])
-  async def slashpokemon(self, ctx: SlashContext, pokemon: str, sprite: str = None):
-    await Pokemon.pokemoncmd(self, ctx, pokemon, sprite)
+  async def slashpokemon(self, ctx: SlashContext, pokemon: str, sprite: str = None, shiny: str = None):
+    await Pokemon.pokemoncmd(self, ctx, pokemon, sprite, shiny)
 
 
-  async def pokemoncmd(self, ctx, poke, pimg):
+  async def pokemoncmd(self, ctx, poke, pimg, shiny):
     try:
       embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
       poke = str(await self.pokename(poke)).lower()
@@ -77,79 +94,28 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Weight", value = await self.pweight(poke))
       embed.add_field(name = "Main Region", value = await self.region(poke))
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
-      if pimg == "back":
-        await self.bimg(poke)
-        embed.set_image(url=f"attachment://{poke}b.png")
-        await ctx.send(file = discord.File(f"{poke}b.png"), embed = embed)
-        os.remove(f"{poke}b.png")
+      if shiny == "shiny":
+        if pimg == "back":
+          await self.bsimg(poke)
+          embed.set_image(url=f"attachment://{poke}sb.png")
+          await ctx.send(file = discord.File(f"{poke}sb.png"), embed = embed)
+          os.remove(f"{poke}sb.png")
+        else:
+          await self.psimg(poke)
+          embed.set_image(url=f"attachment://{poke}sf.png")
+          await ctx.send(file = discord.File(f"{poke}sf.png"), embed = embed)
+          os.remove(f"{poke}sf.png")
       else:
-        await self.pimg(poke)
-        embed.set_image(url=f"attachment://{poke}.png")
-        await ctx.send(file = discord.File(f"{poke}.png"), embed = embed)
-        os.remove(f"{poke}.png")
-    except IndexError:
-      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
-      await ctx.send(embed = embed)
-
-  @commands.command()
-  async def shiny(self, ctx, poke, pimg = None):
-    """
-    Shiny entry for pokemon
-    Usage: shiny <pokemon> {back}
-    {back} is optional (Defaults to `front` if left empty)
-    """
-    await Pokemon.shinycmd(self, ctx, poke, pimg)
-
-  @cog_ext.cog_slash(name = "ShinyPokedex", description= "Search up a shiny pokemon", options = [
-      create_option(
-        name = "pokemon",
-        description = "Pokemon to search",
-        option_type = 3,
-        required = True
-      ),
-      create_option(
-        name = "sprite",
-        description = "Back sprite (Leave empty for Front)",
-        option_type = 3,
-        required = False,
-        choices = [
-          create_choice(
-            name = "front",
-            value = "front"
-          ),
-          create_choice(
-            name = "back",
-            value = "back"
-          )
-        ]
-      )
-    ])
-  async def slashshiny(self, ctx: SlashContext, pokemon: str, sprite: str = None):
-    await Pokemon.shinycmd(self, ctx, pokemon, sprite)
-
-  async def shinycmd(self, ctx, poke, pimg):
-    try:
-      stitle = str(await self.pokename(poke))
-      embedtitle = f'Shiny {stitle}'
-      embed = discord.Embed(title = embedtitle, color = discord.Color.red())
-      poke = str(await self.pokename(poke)).lower()
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-      embed.add_field(name = "Type", value = await self.ptype(poke))
-      embed.add_field(name = "Species", value = await self.pspecies(poke))
-      embed.add_field(name = "Height", value = await self.pheight(poke))
-      embed.add_field(name = "Weight", value = await self.pweight(poke))
-      embed.add_field(name = "Main Region", value = await self.region(poke))
-      embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
-      if pimg == "back":
-        await self.bsimg(poke)
-        embed.set_image(url=f"attachment://{poke}sb.png")
-        await ctx.send(file = discord.File(f"{poke}sb.png"), embed = embed)
-        os.remove(f"{poke}sb.png")
-      else:
-        await self.psimg(poke)
-        embed.set_image(url=f"attachment://{poke}sf.png")
-        await ctx.send(file = discord.File(f"{poke}sf.png"), embed = embed)
-        os.remove(f"{poke}sf.png")
+        if pimg == "back":
+          await self.bimg(poke)
+          embed.set_image(url=f"attachment://{poke}b.png")
+          await ctx.send(file = discord.File(f"{poke}b.png"), embed = embed)
+          os.remove(f"{poke}b.png")
+        else:
+          await self.pimg(poke)
+          embed.set_image(url=f"attachment://{poke}.png")
+          await ctx.send(file = discord.File(f"{poke}.png"), embed = embed)
+          os.remove(f"{poke}.png")
     except IndexError:
       embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
       await ctx.send(embed = embed)

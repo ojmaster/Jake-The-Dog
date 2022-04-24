@@ -93,7 +93,7 @@ class Utility(commands.Cog):
     """See all recent updates to the bot!"""
     await ctx.message.delete()
     embed=discord.Embed(title="__**Bot Updates**__", color=0x7d1ddd)
-    embed.add_field(name="Bug Fixes", value="The `/pokedex (pokemon)` not taking in pokemon ID input has been fixed. \nFixed Invite Link", inline=True)
+    embed.add_field(name="Shiny Command Integrated in Pokedex", value="The `/shinypokedex` command has been integrated into the `/pokedex` command with it now being a choice when in the slash command and an option at the end of the regular command (e.g. >pokemon <pokemon> {back} {shiny})", inline=True)
     await ctx.send(embed=embed)
 
   async def invitecmd(self, ctx):
