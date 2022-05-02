@@ -239,13 +239,8 @@ class Pokemon(commands.Cog):
       return pk.capitalize()
 
   async def pdatadesc(self, pokemon):
-        pdesc = "__**#"
-        pdesc += str(pykemon.get_pokemon(pokemon).id)
-        pdesc += " | "
-        pdesc += str(pykemon.get_pokemon_species(pokemon).generation.name.upper())
-        pdesc += "**__"
-        pdesc = pdesc.replace('GENERATION-', 'Generation ')
-        return pdesc
+    return f"__**#{str(pykemon.get_pokemon(pokemon).id)} | {pykemon.get_pokemon_species(pokemon).generation.name.upper()}**__".replace(
+        'GENERATION-', 'Generation ')
 
   async def pspecies(self, pokemon):
     pk = pykemon.get_pokemon_species(pokemon)
@@ -274,7 +269,7 @@ class Pokemon(commands.Cog):
     pk = pk / 10
     ft = int(round(pk / 0.3048))
     inch = int(round(pk / 0.3048 % 1 * 12))
-    pk = str(pk) + " m " + f"({ft}' {inch:02d}\")"
+    pk = f"{str(pk)} m " + f"({ft}' {inch:02d}\")"
     return str(pk)
 
 
@@ -283,7 +278,7 @@ class Pokemon(commands.Cog):
     pk = pk.weight
     pk = pk / 10
     lbs = pk * 2.205
-    pk = str(pk) + " kg " + f'({lbs:0.1f} lbs)'
+    pk = f"{str(pk)} kg " + f'({lbs:0.1f} lbs)'
     return str(pk)
 
   async def pimg(self, pokemon):
@@ -348,40 +343,31 @@ class Pokemon(commands.Cog):
     img.save("item.png")
 
   async def gen(self, gen):
-    if gen == "generation-i":
-      return 1
-    elif gen == "generation-ii":
-      return 2
-    elif gen == "generation-iii":
-      return 3
-    elif gen == 'generation-iv':
-      return 4
-    elif gen == 'generation-v':
-      return 5
-    elif gen == 'generation-vi':
-      return 6
-    elif gen == 'generation-vii':
-      return 7
-    elif gen == 'generation-viii':
-      return 8
+    switcher = {
+      "generation-i":1,
+      "generation-ii":2,
+      "generation-iii":3,
+      "generation-iv":4,
+      "generation-v":5,
+      "generation-vi":6,
+      "generation-vii":7,
+      "generation-viii":8
+    }
+    return switcher.get(gen, "nothing")
+
 
   async def game(self, game):
-    if game == 1:
-      return 'red'
-    elif game == 2:
-      return 'gold'
-    elif game == 3:
-      return 'ruby'
-    elif game == 4:
-      return 'diamond'
-    elif game == 5:
-      return 'black'
-    elif game == 6:
-      return 'x'
-    elif game == 7:
-      return 'sun'
-    elif game == 8:
-      return 'sword'
+    switcher = {
+      1:"red",
+      2:"gold",
+      3:"ruby",
+      4:"diamond",
+      5:"black",
+      6:"x",
+      7:"sun",
+      8:"sword"
+    }
+    return switcher.get(game, "nothing")
 
   async def region(self, gen):
     return pykemon.get_generation(await self.gen(pykemon.get_pokemon_species(gen).generation.name)).main_region.name.capitalize()
@@ -425,42 +411,27 @@ class Pokemon(commands.Cog):
     return pkab
 
   async def typeicon(self, type):
-    if type == 'Water':
-        return "<:water:946555702032367616>"
-    elif type == 'Steel':
-        return "<:steel:946555701977825290>"
-    elif type == 'Rock':
-        return "<:rock_type:946555701965250630>"
-    elif type == 'Psychic':
-        return "<:psychic:946555701814239233>"
-    elif type == 'Poison':
-        return "<:poison:946555702078505030>"
-    elif type == 'Normal':
-        return "<:normal:946555701742952509>"
-    elif type == 'Ice':
-        return "<:ice:946555701608734721>"
-    elif type == 'Ground':
-        return "<:ground:946555701805850624>"
-    elif type == 'Grass':
-        return "<:grass:946555702011375647>"
-    elif type == 'Ghost':
-        return "<:ghost:946555701780676668>"
-    elif type == 'Flying':
-        return "<:flying:946555701424177173>"
-    elif type == 'Fire':
-        return "<:fire:946555701797457920>"
-    elif type == 'Fighting':
-        return "<:fighting:946555701638094899>"
-    elif type == 'Electric':
-        return "<:electric:946555701789077514>"
-    elif type == 'Dragon':
-        return "<:dragon:946555702133010482>"
-    elif type == 'Bug':
-        return "<:bug:946555689613021244>"
-    elif type == 'Fairy':
-        return "<:fairy:946555701663252553>"
-    elif type == 'Dark':
-        return "<:dark:946555693387907072>"
+    switcher = {
+      "Water":"<:water:946555702032367616>",
+      "Steel":"<:steel:946555701977825290>",
+      "Rock":"<:rock_type:946555701965250630>",
+      "Psychic":"<:psychic:946555701814239233>",
+      "Poison":"<:poison:946555702078505030>",
+      "Normal":"<:normal:946555701742952509>",
+      "Ice":"<:ice:946555701608734721>",
+      "Ground":"<:ground:946555701805850624>",
+      "Grass":"<:grass:946555702011375647>",
+      "Ghost":"<:ghost:946555701780676668>",
+      "Flying":"<:flying:946555701424177173>",
+      "Fire":"<:fire:946555701797457920>",
+      "Fighting":"<:fighting:946555701638094899>",
+      "Electric":"<:electric:946555701789077514>",
+      "Dragon":"<:dragon:946555702133010482>",
+      "Bug":"<:bug:946555689613021244>",
+      "Fairy":"<:fairy:946555701663252553>",
+      "Dark":"<:dark:946555693387907072>"
+    }
+    return switcher.get(type, "nothing")
     
   async def pev(self, pokemon):
     stats = pykemon.get_pokemon(pokemon).stats
@@ -474,32 +445,26 @@ class Pokemon(commands.Cog):
             x += 1
 
   async def statname(self, stat):
-      if stat == 1:
-          return 'HP'
-      elif stat == 2:
-          return 'Atk'
-      elif stat == 3:
-          return 'Def'
-      elif stat == 4:
-          return 'Sp. Atk'
-      elif stat == 5:
-          return 'Sp. Def'
-      elif stat == 6:
-          return 'Spe'
+    switcher = {
+      1:"HP",
+      2:"Atk",
+      3:"Def",
+      4:"Sp. Atk",
+      5:"Sp. Def",
+      6:"Spe"
+    }
+    return switcher.get(stat, "nothing")
 
   async def gcr(self, pokemon):
     gcr = pykemon.get_pokemon_species(pokemon)
-    growth = gcr.growth_rate.name.title() + "/"
+    growth = f"{gcr.growth_rate.name.title()}/"
     capturerate = str(gcr.capture_rate)
     growth = growth.replace("-", " ")
     return growth + capturerate
 
   async def gender(self, pokemon):
     gender = pykemon.get_pokemon_species(pokemon).gender_rate
-    if gender == -1:
-        return "Genderless"
-    else: 
-        return str(gender) + "/8 ♀️"
+    return "Genderless" if gender == -1 else f"{str(gender)}/8 ♀️"
 
   async def egggroup(self, pokemon):
     egggroup = pykemon.get_pokemon_species(pokemon)
