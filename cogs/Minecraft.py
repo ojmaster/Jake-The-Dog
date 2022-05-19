@@ -102,7 +102,7 @@ class Minecraft(commands.Cog):
             version = mcserv['version']
             latency = round(status.latency)
             embed = discord.Embed(
-                title=ip, description="<:online:854498244658593802> Server is online", color=discord.Color.dark_green())
+                title=ip, description="🟢 Server is online", color=discord.Color.dark_green())
             embed.add_field(name="Type", value="Java", inline=False)
             embed.add_field(name="MOTD", value=str(motd)[2:-2])
             embed.add_field(
@@ -120,7 +120,7 @@ class Minecraft(commands.Cog):
 
         except Exception as e:
             embed = discord.Embed(
-                title=ip, description="<:dnd:854498244453335050> Server is offline", color=discord.Color.dark_red())
+                title=ip, description="🔴 Server is offline", color=discord.Color.dark_red())
             await ctx.send(embed=embed)
 
     @commands.command(aliases=['mcb'])
@@ -161,7 +161,7 @@ class Minecraft(commands.Cog):
             motd = mcserv['motd']['clean']
             version = mcserv['version']
             embed = discord.Embed(
-                title=ip, description="<:online:854498244658593802> Server is online", color=discord.Color.dark_green())
+                title=ip, description="🟢 Server is online", color=discord.Color.dark_green())
             embed.add_field(name="Type", value="Bedrock", inline=False)
             embed.add_field(name="MOTD", value=str(motd)[2:-2])
             embed.add_field(
@@ -177,7 +177,7 @@ class Minecraft(commands.Cog):
 
         except Exception as e:
             embed = discord.Embed(
-                title=ip, description="<:dnd:854498244453335050> Server is offline", color=discord.Color.dark_red())
+                title=ip, description="🔴 Server is offline", color=discord.Color.dark_red())
             embed.add_field(name="Did you put in the right IP?",
                             value="Make sure the right IP is used")
             await ctx.send(embed=embed)
