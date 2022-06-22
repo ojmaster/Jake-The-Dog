@@ -35,7 +35,7 @@ MarkupSafe==2.0.1
 mcstatus==6.4.0
 mojang==0.1.8
 multidict==4.7.6
-Pillow==8.3.1
+Pillow==9.1.1
 pokepy==0.6.2
 progress==1.5
 psutil==5.8.0
