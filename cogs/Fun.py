@@ -29,11 +29,10 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def _bonk(self, ctx, user = None):
+    async def _bonk(self, ctx, user == None):
         embed = discord.Embed(title="", color=discord.Color.dark_blue())
         embed.set_image(url="https://rb.gy/tkbdmz")
-        
-        if user is None:
+        if user == None:
             await ctx.send(embed = embed)
         else:
             embed.set_footer(text=f"Bonk by: {ctx.author.name}")
