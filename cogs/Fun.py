@@ -29,7 +29,7 @@ class Fun(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def _bonk(self, ctx, user: discord.User = None):
+    async def _bonk(self, ctx, user):
         embed = discord.Embed(title="", color=discord.Color.dark_blue())
         embed.set_image(url="https://rb.gy/tkbdmz")
         embed.set_footer(text=f"Bonk by: {ctx.author.name}")
@@ -38,7 +38,8 @@ class Fun(commands.Cog):
         else:
             await ctx.send(content = user.mention, embed = embed)
 
-    @cog_ext.cog_slash(name="Bonk", description="Get Bonked", options=[
+
+    @cog_ext.cog_slash(name="Bonk", description="Get Bonked", guild_ids=[651230389171650560], options=[
         create_option(
             name="user",
             description="Who we bonking?",
@@ -46,7 +47,7 @@ class Fun(commands.Cog):
             required=False
         )
     ])
-    async def bonkcm(self, ctx: SlashContext, user=""):
+    async def bonkcm(self, ctx: SlashContext, user= None):
         """Bonk ur bad"""
         await Fun._bonk(self, ctx, user)
 
