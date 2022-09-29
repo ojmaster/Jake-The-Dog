@@ -65,7 +65,7 @@ async def change_stat():
 async def listservers():
     print("Server List:")
     for guild in bot.guilds:
-        print(f" Name: {str(guild.name)} || ID: {str(guild.id)}")
+      print(f" Name: {str(guild.name)} || ID: {str(guild.id)}")
 
 
 @bot.event
@@ -80,8 +80,8 @@ async def on_guild_join(guild):
                           description="Heyo!",
                           color=discord.Color.purple())
     embed.add_field(
-        name="My default prefix is '>''",
-        value="You can change my prefix with the `>setprefix <prefix>`",
+        name="We use slash commands!",
+        value="Try it out using `/`",
         inline=False)
     for channel in guild.channels:
         if (
