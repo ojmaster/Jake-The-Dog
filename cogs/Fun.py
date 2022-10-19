@@ -127,85 +127,77 @@ class Fun(interactions.Extension):
             seconds -= 1
         await ctx.edit(f"{ctx.user.mention}\n**DING DING DING :alarm_clock:**")
 
-#    @interactions.extension_user_command(name="RIP", scope = [651230389171650560])
-#    async def ripcm(self, ctx: ComponentContext):
-#        await ctx.send(f'R.I.P. {ctx.target.mention}\nhttps://tenor.com/bipRq.gif')
-#
-#    @commands.command()
-#    async def rip(self, ctx, member: str):
-#        """RIP MY GUY"""
-#        await ctx.send(f'R.I.P. {member}\nhttps://tenor.com/bipRq.gif')
-#
-#    async def hypecmd(self, ctx):
-#        hypu = ['https://cdn.discordapp.com/attachments/102817255661772800/219514281136357376/tumblr_nr6ndeEpus1u21ng6o1_540.gif',
-#                'https://cdn.discordapp.com/attachments/102817255661772800/219518372839161859/tumblr_n1h2afSbCu1ttmhgqo1_500.gif',
-#                'https://gfycat.com/HairyFloweryBarebirdbat',
-#                'https://i.imgur.com/PFAQSLA.gif',
-#                'https://abload.de/img/ezgif-32008219442iq0i.gif',
-#                'https://i.imgur.com/vOVwq5o.jpg',
-#                'https://i.imgur.com/Ki12X4j.jpg',
-#                'https://media.giphy.com/media/b1o4elYH8Tqjm/giphy.gif']
-#        msg = f':train2: CHOO CHOO {random.choice(hypu)}'
-#        await ctx.send(msg)
-#
-#    @commands.command()
-#    async def hype(self, ctx):
-#        '''HYPE TRAIN CHOO CHOO'''
-#        await Fun.hypecmd(self, ctx)
-#
-#    async def puncmd(self, ctx):
-#        data = json.load(
-#            open('./config/choices.json', encoding="utf8", errors='ignore'))
-#        emojis = ['😆', '😄', '😂', '😭', '🤣']
-#        url = "https://raw.githubusercontent.com/dabbers/OPun/main/data.json"
-#        response = urlopen(url)
-#        data_json = json.loads(response.read())["data"]["posts"]
-#        pn = await ctx.send(random.choice(data_json)["plaintext"])
-#        await pn.add_reaction(random.choice(emojis))
-#
-#    @commands.command(aliases=['joke'])
-#    async def pun(self, ctx):
-#        '''Because everybody likes bad jokes'''
-#        await Fun.puncmd(self, ctx)
-#
-#    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="Send a Pun")
-#    async def puncm(self, ctx: MenuContext):
-#        await Fun.puncmd(self, ctx)
-#
-#    @cog_ext.cog_slash(name="Pun", description="Send a Pun")
-#    async def slashpun(self, ctx: SlashContext):
-#        await Fun.puncmd(self, ctx)
-#
-#    async def tordcmd(self, ctx, player):
-#        embed = discord.Embed(title="Truth or Dare",
-#                              color=discord.Color.dark_orange())
+  
+    @interactions.extension_user_command(name="RIP", scope = [651230389171650560])
+    async def ripcm(self, ctx: ComponentContext):
+        await ctx.send(f'R.I.P. {ctx.target.mention}\nhttps://tenor.com/bipRq.gif')
+
+    @interactions.extension_command(name = "hype", description = "HYPE HYPE HYPE HYPE!!!!", scope = [651230389171650560])
+    async def hypecmd(self, ctx: CommandContext):
+        await ctx.get_channel()
+        hypu = ['https://cdn.discordapp.com/attachments/102817255661772800/219514281136357376/tumblr_nr6ndeEpus1u21ng6o1_540.gif',
+                'https://cdn.discordapp.com/attachments/102817255661772800/219518372839161859/tumblr_n1h2afSbCu1ttmhgqo1_500.gif',
+                'https://gfycat.com/HairyFloweryBarebirdbat',
+                'https://i.imgur.com/PFAQSLA.gif',
+                'https://abload.de/img/ezgif-32008219442iq0i.gif',
+                'https://i.imgur.com/vOVwq5o.jpg',
+                'https://i.imgur.com/Ki12X4j.jpg',
+                'https://media.giphy.com/media/b1o4elYH8Tqjm/giphy.gif']
+        msg = f':train2: CHOO CHOO {random.choice(hypu)}'
+        await ctx.send(msg)
+
+
+    async def puncmd(self, ctx: CommandContext):
+        await ctx.get_channel()
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        emojis = ['😆', '😄', '😂', '😭', '🤣']
+        url = "https://raw.githubusercontent.com/dabbers/OPun/main/data.json"
+        response = urlopen(url)
+        data_json = json.loads(response.read())["data"]["posts"]
+        pn = await ctx.send(random.choice(data_json)["plaintext"])
+        await pn.create_reaction(random.choice(emojis))
+
+
+    @interactions.extension_command(name = "pun", description = "Because everybody likes a bad joke", scope = [651230389171650560])
+    async def pun(self, ctx: CommandContext):
+        await Fun.puncmd(ctx)
+
+    @interactions.extension_user_command(name="Send a Pun", scope = [651230389171650560])
+    async def puncm(self, ctx: ComponentContext):
+        await Fun.puncmd(ctx)
+
+
+#    async def tordcmd(ctx, player):
+#        embed = interactions.Embed(title="Truth or Dare",
+#                              color= 0xF4975F)
 #        embed.add_field(name="Truth", value="🇹")
 #        embed.add_field(name="Dare", value="🇩")
-#        buttons = [
-#            create_button(
-#                style=ButtonStyle.blue,
-#                label="Truth",
-#                custom_id="truth"
-#            ),
-#            create_button(
-#                style=ButtonStyle.red,
-#                label="Dare",
-#                custom_id="dare"
-#            )
-#        ]
-#        action_row = create_actionrow(*buttons)
+#        button = interactions.Button(
+#            style= interactions.ButtonStyle.PRIMARY,
+#            label="Truth",
+#            custom_id="truth"
+#        )
+#        button2 = interactions.Button(
+#            style= interactions.ButtonStyle.DANGER,
+#            label="Dare",
+#            custom_id="dare"
+#        )
+#        action_row = interactions.ActionRow(components=[button, button2])
 #        if player != "":
-#            msg = await ctx.send(content=f'{player.mention}', embed=embed, components=[action_row])
+#            msg = await ctx.send(content=f'{ctx.user.mention}', embed=embed, components=[action_row])
 #        else:
 #            msg = await ctx.send(embed=embed, components=[action_row])
 #
+#    @interactions.extension_command("Truth")
+#    async def truther(self, ctx)
 #        try:
 #            res: ComponentContext = await wait_for_component(ctx.bot, components=[action_row], timeout=15)
 #            await msg.delete()
 #            data = json.load(
 #                open('./config/choices.json', encoding="utf8", errors='ignore'))
 #            values = [v for d in data[f'{res.component_id}']
-#                      for k, v in d.items()]
+#                        for k, v in d.items()]
 #            if str(res.component_id) == 'truth':
 #                embcolor = discord.Color.green()
 #                embtitle = 'Truth'
@@ -220,12 +212,8 @@ class Fun(interactions.Extension):
 #            embed = discord.Embed(
 #                title='Took too long to respond', color=discord.Color.dark_red())
 #            await ctx.send(embed=embed)
-#
-#    @commands.command(aliases=["TruthOrDare", "truthdare", "td"])
-#    async def tord(self, ctx, user: discord.Member = ""):
-#        """Truth or Dare"""
-#        await Fun.tordcmd(self, ctx, user)
-#
+
+
 #    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="Truth or Dare")
 #    async def tordcm(self, ctx: Union[ComponentContext, MenuContext]):
 #        await Fun.tordcmd(self, ctx, ctx.target_author)
