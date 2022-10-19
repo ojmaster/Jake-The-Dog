@@ -106,6 +106,7 @@ async def listservers():
 #        print(f'cogs.{filename[:-3]}')
 #
 #
+
 @bot.command(description = "All servers bot is in", scope = [651230389171650560])
 async def servercount(ctx: CommandContext):
     await ctx.get_guild()

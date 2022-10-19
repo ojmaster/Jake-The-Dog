@@ -1,4 +1,5 @@
 import asyncio
+from code import interact
 import json
 import random
 from logging import error
@@ -6,7 +7,7 @@ from typing import Union
 
 from urllib.request import urlopen
 import interactions
-from interactions import CommandContext, Guild
+from interactions import CommandContext, ComponentContext, Guild
 from urbandictionary_top import udtop
 
 class Fun(interactions.Extension):
@@ -26,137 +27,109 @@ class Fun(interactions.Extension):
         await ctx.send(embeds = embed)
 
 
-#    async def slotcmd(self, ctx):
-#        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
-#        a = random.choice(emojis)
-#        b = random.choice(emojis)
-#        c = random.choice(emojis)
-#
-#        slotmachine = f"**[ {a} {b} {c} ]\n{ctx.author.name}**,"
-#
-#        if (a == b == c):
-#            await ctx.send(f"{slotmachine} All matching, you won! 🎉")
-#        elif (a == b) or (a == c) or (b == c):
-#            await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
-#        else:
-#            await ctx.send(f"{slotmachine} No match, you lost 😢")
-#
-#    @commands.command(aliases=["bet"])
-#    @commands.cooldown(rate=1, per=3.0, type=commands.BucketType.user)
-#    async def slots(self, ctx):
-#        """Roll the slot machine"""
-#        await Fun.slotcmd(self, ctx)
-#
-#    @cog_ext.cog_slash(name="Slots", description="Play slots!")
-#    async def slotslash(self, ctx: SlashContext):
-#        await Fun.slotcmd(self, ctx)
-#
-#    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="Slots")
-#    async def slotscm(self, ctx: MenuContext):
-#        await Fun.slotcmd(self, ctx)
-#
-#    @cog_ext.cog_slash(name="8ball", description="Consult the wise 8ball", options=[
-#        create_option(
-#            name="question",
-#            description="Your humble question",
-#            option_type=3,
-#            required=True
-#        )
-#    ]   )
-#    async def slasheightball(self, ctx: SlashContext, question: str):
-#        data = json.load(
-#            open('./config/choices.json', encoding="utf8", errors='ignore'))
-#        responses = [v for d in data['eightball'] for k, v in d.items()]
-#        msg = f'{random.choice(responses)}'
-#        await ctx.send(content=f'__Question:__ {question} \n__Response:__ {msg}')
-#
-#    @commands.command(name="8ball")
-#    async def eightball(self, ctx, question):
-#        """Consult the wise master for the answer to your questions"""
-#        data = json.load(
-#            open('./config/choices.json', encoding="utf8", errors='ignore'))
-#        responses = [v for d in data['eightball'] for k, v in d.items()]
-#        msg = f'{random.choice(responses)}'
-#        await ctx.reply(msg)
-#
-#    async def coinflipcmd(self, ctx):
-#        coinsides = ["Heads", "Tails"]
-#        await ctx.send(f"**{ctx.author.name}** flipped a coin and got **{random.choice(coinsides)}**!")
-#
-#    @commands.command(aliases=["flip", "coin"])
-#    async def coinflip(self, ctx):
-#        """ Coinflip! """
-#        await Fun.coinflipcmd(self, ctx)
-#
-#    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="Coin Flip")
-#    async def coinflipcm(self, ctx: MenuContext):
-#        await Fun.coinflipcmd(self, ctx)
-#
-#    @cog_ext.cog_slash(name="CoinFlip", description="Flip a coin!")
-#    async def slashcoinflip(self, ctx: SlashContext):
-#        await Fun.coinflipcmd(self, ctx)
-#
-#    @commands.command(aliases=["urbandictionary", "urbandict"])
-#    async def urban(self, ctx, *, search):
-#        """ Find the 'best' definition to your words """
-#        term = udtop(search)
-#        search = search.capitalize()
-#        embed = discord.Embed(
-#            title=f'__{search}__', description=str(term).replace("Example:", "__Example:__"), color=discord.Color.purple())
-#        await ctx.send(embed=embed)
-#
-#    @cog_ext.cog_slash(name="UrbanDictionary", description="Find the urban definition of your words", options=[
-#        create_option(
-#            name="word",
-#            description="Your 'urban' word",
-#            option_type=3,
-#            required=True
-#        )
-#    ])
-#    async def slashurban(self, ctx: SlashContext, word: str):
-#        term = udtop(word)
-#        search = word.capitalize()
-#        embed = discord.Embed(
-#            title=f'__{search}__', description=term, color=discord.Color.purple())
-#        await ctx.send(embed=embed)
-#
-#    @commands.command()
-#    async def pick(self, ctx, *arg):
-#        """
-#        Pick from a list of choices
-#        """
-#        choices = list(arg)
-#        choices.pop(0)
-#        await ctx.send(f'{random.choice(choices)}')
-#        return
-#
-#    async def cog_command_error(self, ctx, error):
-#        print('Error in {0.command.qualified_name}: {1}'.format(ctx, error))
-#
-#    def userOnline(self, memberList):
-#        return [
-#            i
-#            for i in memberList
-#            if i.status == discord.Status.online and i.bot == False
-#        ]
-#
-#    @commands.command(aliases=["countdown"])
-#    async def timer(self, ctx, number: int):
-#        '''Set a timer in seconds'''
-#        mins, sec = divmod(number, 60)
-#        timer = '{:02d}:{:02d}'.format(mins, sec)
-#        count = await ctx.send(f"`{timer}`")
-#        while number >= 0:
-#            mins, sec = divmod(number, 60)
-#            timer = '{:02d}:{:02d}'.format(mins, sec)
-#            await count.edit(content = f"`{timer}`")
-#            await asyncio.sleep(1)
-#            number -= 1
-#        await ctx.reply(f"{ctx.author.mention}\n**DING DING DING :alarm_clock:**")
-#
-#    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="RIP")
-#    async def ripcm(self, ctx: MenuContext):
-#        await ctx.send(f'R.I.P. {ctx.target_author.mention}\nhttps://tenor.com/bipRq.gif')
+    async def slotcmd(self, ctx):
+        await ctx.get_channel()
+        emojis = "🍎🍊🍐🍋🍉🍇🍓🍒"
+        a = random.choice(emojis)
+        b = random.choice(emojis)
+        c = random.choice(emojis)
+
+        slotmachine = f"**[ {a} {b} {c} ]\n{ctx.user.username}**,"
+
+        if (a == b == c):
+            await ctx.send(f"{slotmachine} All matching, you won! 🎉")
+        elif (a == b) or (a == c) or (b == c):
+            await ctx.send(f"{slotmachine} 2 in a row, you won! 🎉")
+        else:
+            await ctx.send(f"{slotmachine} No match, you lost 😢")
+
+    @interactions.extension_command(description = "Slots", scope = [651230389171650560])
+    async def slots(self, ctx: CommandContext):
+        await self.slotcmd(ctx)
+
+    @interactions.extension_user_command(name = "Slots", scope = [651230389171650560])
+    async def slotscm(self, ctx):
+        await self.slotcmd(ctx)
+
+    
+    @interactions.extension_command(name = "8ball", description = "Let the wisdowm of the 8ball give you the answers you seek", scope = [651230389171650560], options = [interactions.Option(
+                                                                                            type = interactions.OptionType.STRING,
+                                                                                            name = "question",
+                                                                                            description = "Your humble question",
+                                                                                            required = True
+                                                                                            )])
+    async def eigthball(self, ctx: CommandContext, question):
+        await ctx.get_channel()
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        responses = [v for d in data['eightball'] for k, v in d.items()]
+        msg = f'{random.choice(responses)}'
+        await ctx.send(content=f'__Question:__ {question} \n__Response:__ {msg}')
+        
+    
+    @interactions.extension_command(name = "coinflip", description = "Flip a coin", scope = [651230389171650560])
+    async def coinflip(self, ctx: CommandContext):
+        await ctx.get_channel()
+        coinsides = ["Heads", "Tails"]
+        await ctx.send(f"**{ctx.user.username}** flipped a coin and got **{random.choice(coinsides)}**!")
+
+    @interactions.extension_user_command(name = "Coinflip", scope = [651230389171650560])
+    async def coinflipcm(self, ctx: ComponentContext):
+        coinsides = ["Heads", "Tails"]
+        await ctx.send(f"**{ctx.user.username}** flipped a coin and got **{random.choice(coinsides)}**!")
+
+
+    @interactions.extension_command(name = "urbandictionary", description = "Look up the urban diction of your word", scope = [651230389171650560],  options = [interactions.Option(
+                                                                                                                                    type = interactions.OptionType.STRING,
+                                                                                                                                    name = "search",
+                                                                                                                                    description = "Word to search",
+                                                                                                                                    required = True
+                                                                                                                                )])
+    async def urban(self, ctx, search):
+        await ctx.get_channel()
+        term = udtop(search)
+        embed = interactions.Embed(
+            title=f'__{search.capitalize()}__', description=str(term).replace("Example:", "__Example:__"), color=interactions.Color.blurple())
+        await ctx.send(embed=embed)
+
+    @interactions.extension_command(name = "choose", description = "Pick from a list of choices", scope = [651230389171650560])
+    @interactions.option(name = "option", required = True, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option2", required = True, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option3", required = False, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option4", required = False, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option5", required = False, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option6", required = False, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option7", required = False, type = interactions.OptionType.STRING)
+    @interactions.option(name = "option8", required = False, type = interactions.OptionType.STRING)
+    async def pick(self, ctx: CommandContext, option, option2, option3 = None, option4 = None, option5 = None, option6 = None, option7 = None, option8 = None):
+        await ctx.get_channel()
+        options = [option, option2, option3, option4, option5, option6, option7, option8]
+        options = [x for x in options if x is not None]
+        await ctx.send(f'{random.choice(options)}')
+        
+
+    @interactions.extension_command(name = "countdown", description = "Set a timer in seconds", scope = [651230389171650560], options = [interactions.Option(
+                                                                                                        name = "seconds",
+                                                                                                        description = "Time in seconds", 
+                                                                                                        type = interactions.OptionType.INTEGER, 
+                                                                                                        required = True)])
+    async def countdown(self, ctx: CommandContext, seconds: int):
+        '''Set a timer in seconds'''
+        await ctx.get_channel()
+        mins, sec = divmod(seconds, 60)
+        timer = '{:02d}:{:02d}'.format(mins, sec)
+        count = await ctx.send(f"`{timer}`")
+        while seconds >= 0:
+            mins, sec = divmod(seconds, 60)
+            timer = '{:02d}:{:02d}'.format(mins, sec)
+            await count.edit(content = f"`{timer}`")
+            await asyncio.sleep(1)
+            seconds -= 1
+        await ctx.edit(f"{ctx.user.mention}\n**DING DING DING :alarm_clock:**")
+
+#    @interactions.extension_user_command(name="RIP", scope = [651230389171650560])
+#    async def ripcm(self, ctx: ComponentContext):
+#        await ctx.send(f'R.I.P. {ctx.target.mention}\nhttps://tenor.com/bipRq.gif')
 #
 #    @commands.command()
 #    async def rip(self, ctx, member: str):
