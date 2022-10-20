@@ -138,7 +138,7 @@ cogchoices = [
                                                                                                   )])
 async def reload(ctx: CommandContext, extension):
   await ctx.get_guild()
-  bot.reload(f'cogs.{extension}')
+  bot.reload(f'cogs.{extension}', remove_commands=False)
   await ctx.send(f'Extension "{extension}" reloaded!')
 
 @bot.command(description = "Loads extension", scope = [651230389171650560], options = [interactions.Option(

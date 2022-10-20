@@ -147,7 +147,7 @@ class Fun(interactions.Extension):
         await ctx.send(msg)
 
 
-    async def puncmd(self, ctx: CommandContext):
+    async def puncmd(self, ctx):
         await ctx.get_channel()
         data = json.load(
             open('./config/choices.json', encoding="utf8", errors='ignore'))
@@ -161,73 +161,68 @@ class Fun(interactions.Extension):
 
     @interactions.extension_command(name = "pun", description = "Because everybody likes a bad joke", scope = [651230389171650560])
     async def pun(self, ctx: CommandContext):
-        await Fun.puncmd(ctx)
+        await Fun.puncmd(self, ctx)
 
     @interactions.extension_user_command(name="Send a Pun", scope = [651230389171650560])
     async def puncm(self, ctx: ComponentContext):
-        await Fun.puncmd(ctx)
+        await Fun.puncmd(self, ctx)
 
 
-#    async def tordcmd(ctx, player):
-#        embed = interactions.Embed(title="Truth or Dare",
-#                              color= 0xF4975F)
-#        embed.add_field(name="Truth", value="🇹")
-#        embed.add_field(name="Dare", value="🇩")
-#        button = interactions.Button(
-#            style= interactions.ButtonStyle.PRIMARY,
-#            label="Truth",
-#            custom_id="truth"
-#        )
-#        button2 = interactions.Button(
-#            style= interactions.ButtonStyle.DANGER,
-#            label="Dare",
-#            custom_id="dare"
-#        )
-#        action_row = interactions.ActionRow(components=[button, button2])
-#        if player != "":
-#            msg = await ctx.send(content=f'{ctx.user.mention}', embed=embed, components=[action_row])
-#        else:
-#            msg = await ctx.send(embed=embed, components=[action_row])
-#
-#    @interactions.extension_command("Truth")
-#    async def truther(self, ctx)
-#        try:
-#            res: ComponentContext = await wait_for_component(ctx.bot, components=[action_row], timeout=15)
-#            await msg.delete()
-#            data = json.load(
-#                open('./config/choices.json', encoding="utf8", errors='ignore'))
-#            values = [v for d in data[f'{res.component_id}']
-#                        for k, v in d.items()]
-#            if str(res.component_id) == 'truth':
-#                embcolor = discord.Color.green()
-#                embtitle = 'Truth'
-#            elif str(res.component_id) == 'dare':
-#                embcolor = discord.Color.red()
-#                embtitle = 'Dare'
-#            embed = discord.Embed(
-#                title=embtitle, description=random.choice(values), color=embcolor)
-#            await ctx.send(embed=embed)
-#
-#        except asyncio.TimeoutError:
-#            embed = discord.Embed(
-#                title='Took too long to respond', color=discord.Color.dark_red())
-#            await ctx.send(embed=embed)
+    async def tordcmd(self, ctx, player):
+        embed = interactions.Embed(title="Truth or Dare",
+                              color= 0xF4975F)
+        button = interactions.Button(
+            style= interactions.ButtonStyle.SUCCESS,
+            label="Truth",
+            custom_id="Truth"
+        )
+        button2 = interactions.Button(
+            style= interactions.ButtonStyle.DANGER,
+            label="Dare",
+            custom_id="Dare"
+        )
+        action_row = interactions.ActionRow(components=[button, button2])
+        if player != "":
+            await ctx.send(content=f'{ctx.user.mention}', embeds=embed, components=[action_row])
+        else:
+            await ctx.send(embeds=embed, components=[action_row])
 
 
-#    @cog_ext.cog_context_menu(target=ContextMenuType.USER, name="Truth or Dare")
-#    async def tordcm(self, ctx: Union[ComponentContext, MenuContext]):
-#        await Fun.tordcmd(self, ctx, ctx.target_author)
-#
-#    @cog_ext.cog_slash(name="TruthOrDare", description="A fun game of Truth or Dare", options=[
-#        create_option(
-#            name="user",
-#            description="User to ask",
-#            option_type=6,
-#            required=False
-#        )
-#    ])
-#    async def slashtord(self, ctx: SlashContext, user=""):
-#        await Fun.tordcmd(self, ctx, user)
+
+    @interactions.extension_component("Truth")
+    async def truther(self, ctx):
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        values = [v for d in data['truth']
+                    for k, v in d.items()]
+        embed = interactions.Embed(title = "Truth", description = random.choice(values), color = interactions.Color.green())
+        await ctx.message.delete()
+        await ctx.send(embeds=embed, components = [])
+        
+
+
+    @interactions.extension_component("Dare")
+    async def darer(self, ctx):
+        data = json.load(
+            open('./config/choices.json', encoding="utf8", errors='ignore'))
+        values = [v for d in data['dare']
+                    for k, v in d.items()]
+        embed = interactions.Embed(title = "Dare", description = random.choice(values), color = interactions.Color.red())
+        await ctx.message.delete()
+        await ctx.send(embeds=embed, components = [])
+        
+
+
+    @interactions.extension_command(name="truthordare", description="A fun game of Truth or Dare", scope = [651230389171650560], options=[
+        interactions.Option(
+            type = interactions.OptionType.USER,
+            name="user",
+            description="User to ask",
+            required=False
+        )
+    ])
+    async def slashtord(self, ctx: CommandContext, user: interactions.User = ""):
+        await Fun.tordcmd(self, ctx, user)
 
 
 def setup(bot):
