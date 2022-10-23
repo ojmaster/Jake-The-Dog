@@ -2,7 +2,7 @@
 
 ## Features
 
-**SQL** database that allows for servers to set a custom prefix
+**SQL** database that allows for servers to set a custom prefix //Deprecated
 Accessing different APIs such as:
 ```
 [DiscordAPI](https://discord.com/developers/docs/reference)
@@ -13,7 +13,7 @@ UrbanDictionary
 
 These are all done through the use of different libraries
 ```
-discord.py
+discord.py -> interactions.py
 pokepy
 mojang
 urbandictionary_top
