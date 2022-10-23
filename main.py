@@ -1,10 +1,9 @@
 import interactions
-import os
-from interactions import CommandContext, Guild
+from interactions import CommandContext
 from interactions.ext.tasks import IntervalTrigger, create_task
 from configparser import ConfigParser
 import random
-import asyncio
+
 
 config = ConfigParser()
 config.read('./config/options.ini')

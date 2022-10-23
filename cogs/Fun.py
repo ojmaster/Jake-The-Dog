@@ -1,13 +1,10 @@
 import asyncio
-from code import interact
 import json
 import random
-from logging import error
-from typing import Union
 
 from urllib.request import urlopen
 import interactions
-from interactions import CommandContext, ComponentContext, Guild
+from interactions import CommandContext, ComponentContext
 from urbandictionary_top import udtop
 
 class Fun(interactions.Extension):
