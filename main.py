@@ -1,64 +1,75 @@
-import sqlite3
-import discord
-from discord.ext import commands, tasks
-import os
+import interactions
+from interactions import CommandContext
+from interactions.ext.tasks import IntervalTrigger, create_task
 from configparser import ConfigParser
-import random
-from discord_slash import SlashCommand
-import asyncio
+import random, os
+
 
 config = ConfigParser()
 config.read('./config/options.ini')
 TOKEN = config.get('Bot_Config', 'TOKEN')
 
-def get_prefix(bot, message):
-    if not message.guild:
-      return commands.when_mentioned_or(">")(bot, message)
-    conn = sqlite3.connect('config/prefixes.sqlite')
-    c = conn.cursor()
-    c.execute("SELECT prefix FROM prefixes WHERE guild = ?", (message.guild.id,))
-    prefix = c.fetchone()[0]
-    conn.close()
-    return prefix
+#def get_prefix(bot, message):
+#  if not message.guild:
+#    return commands.when_mentioned_or(">")(bot, message)
+#  conn = sqlite3.connect('config/prefixes.sqlite')
+#  c = conn.cursor()
+#  c.execute("SELECT prefix FROM prefixes WHERE guild = ?", (message.guild.id,))
+#  prefix = c.fetchone()[0]
+#  conn.close()
+#  return prefix
 
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix=get_prefix, intents=intents, case_insensitive=True)
-client = discord.Client()
-slash = SlashCommand(bot, sync_commands=True) 
-
-bot.remove_command('help')
+_ready: bool = False
+bot = interactions.Client(token = TOKEN, intents = interactions.Intents.DEFAULT | interactions.Intents.GUILD_PRESENCES | interactions.Intents.GUILD_MEMBERS)
+bot.load("interactions.ext.files")
 
 async def presence():
     act = random.randint(1, 5)
     if act == 1:
-      dact = discord.Game(name="BMO")
+      dact = interactions.PresenceActivity(
+                type = interactions.PresenceActivityType.GAME,
+                name="BMO"
+              )
     elif act == 2:
-      dact = discord.Streaming(name="Pirates of the Enchiridion", url="https://www.twitch.tv/0jmaster")
+      dact = interactions.PresenceActivity(
+                type = interactions.PresenceActivityType.STREAMING,
+                name="Pirates of the Enchiridion",
+                url="https://www.twitch.tv/0jmaster"
+              )
     elif act == 3:
-      dact = discord.Activity(type=discord.ActivityType.listening, name="Island Song")
+      dact = interactions.PresenceActivity(
+                type = interactions.PresenceActivityType.LISTENING,
+                name="Island Song"
+              )
     elif act == 4:
-      dact = discord.Activity(type=discord.ActivityType.watching, name="Distant Lands")
+      dact = interactions.PresenceActivity(
+                type = interactions.PresenceActivityType.WATCHING,
+                name="Distant Lands"
+              )
     elif act == 5:
-      dact = discord.Activity(type=5,name="Card Wars")
-    return await bot.change_presence(activity=dact)
+      dact = interactions.PresenceActivity(
+                type = interactions.PresenceActivityType.COMPETING,
+                name="Card Wars"
+              )
+    return await bot.change_presence(presence=interactions.ClientPresence(status = interactions.StatusType.ONLINE, activities = [dact]))
 
 
 @bot.event
 async def on_ready():
-    print('------')
-    print('Logged in as')
-    print(bot.user.name)
-    print(bot.user.id)
-    print('------')
-    await listservers()
-    await presence()
-    if not hasattr(bot, 'appinfo'):
-        bot.appinfo = await bot.application_info()
-    await client.login(TOKEN)
-    change_stat.start()
+  global _ready
+  if not _ready:
+      print('------')
+      print('Logged in as')
+      u = interactions.User(**await bot._http.get_self())
+      print(u.username)
+      print(u.id)
+      print('------')
+      await listservers()
+      await presence()
+      change_stat.start()
+      _ready = True
 
-
-@tasks.loop(hours = 3)
+@create_task(IntervalTrigger(10800))
 async def change_stat():
     await presence()
 
@@ -68,99 +79,90 @@ async def listservers():
       print(f" Name: {str(guild.name)} || ID: {str(guild.id)}")
 
 
-@bot.event
-async def on_guild_join(guild):
-    conn = sqlite3.connect('config/prefixes.sqlite')
-    c = conn.cursor()
-    c.execute("INSERT INTO prefixes VALUES (?, ?)", (guild.id, ">"))
-    conn.commit()
-    conn.close()
-    bs = False
-    embed = discord.Embed(title="**Jake the Dog**",
-                          description="Heyo!",
-                          color=discord.Color.purple())
-    embed.add_field(
-        name="We use slash commands!",
-        value="Try it out using `/`",
-        inline=False)
-    for channel in guild.channels:
-        if (
-            channel.type is discord.ChannelType.text
-            and (
-                "chat" in channel.name
-                or "staff" in channel.name
-                or "main" in channel.name
-                or "general" in channel.name
-            )
-            and channel.permissions_for(guild.me).send_messages
-        ):
-            await asyncio.sleep(0.1)
-            await channel.send(embed=embed)
-            bs = True
-            break
-    if not bs:
-        for channel in guild.channels:
-            if (
-                channel.type is discord.ChannelType.text
-                and channel.permissions_for(guild.me).send_messages
-            ):
-                await asyncio.sleep(0.1)
-                await channel.send(embed=embed)
-                break
+#@bot.event
+#async def on_guild_create(guild):
+#    embed = interactions.Embed(title = "**Jake the Dog**", 
+#                          description = f"Hello {guild.name}!",
+#                          color = 0xA020F0
+#    )
+#    if guild.joined_at 
+#      for channel in guild.channels:
+#          if channel.type is interactions.ChannelType.GUILD_TEXT and channel.name.contains("general"):
+#              await channel.send(embeds = embed)
 
 
-@bot.event
-async def on_guild_remove(guild):
-    conn = sqlite3.connect('config/prefixes.sqlite')
-    c = conn.cursor()
-    c.execute("DELETE FROM prefixes WHERE guild = ?", (guild.id,))
-    conn.commit()
-    conn.close()
-
-
+#@bot.event
+#async def on_guild_remove(guild):
+#    conn = sqlite3.connect('config/prefixes.sqlite')
+#    c = conn.cursor()
+#    c.execute("DELETE FROM prefixes WHERE guild = ?", (guild.id,))
+#    conn.commit()
+#    conn.close()
+#
+#
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py') and not filename.startswith('Owner'):
-        bot.load_extension(f'cogs.{filename[:-3]}')
+        bot.load(f'cogs.{filename[:-3]}')
         print(f'cogs.{filename[:-3]}')
 
 
-@bot.command(name = "serverlist", 
-            description = "All servers bot is in", 
-            hidden = True)
-async def servers(ctx):
-    if ctx.author == bot.appinfo.owner:
-        count = sum(1 for _ in bot.guilds)
-        embed = discord.Embed(title = "**Server Count**", description = count, color = discord.Color.red())
-        await ctx.reply(embed = embed)
-    else:
-        ctx.reply("Only available to Bot Owner")
+@bot.command(description = "All servers bot is in", scope = [651230389171650560])
+async def servercount(ctx: CommandContext):
+    await ctx.get_guild()
+    count = sum(1 for _ in bot.guilds)
+    embed = interactions.Embed(title = "**Server Count**", description = count, color = interactions.Color.red())
+    await ctx.send(embeds = embed)
+
+cogchoices = [
+  interactions.Choice(
+    name = "Fun",
+    value = "Fun"),
+  interactions.Choice(
+    name = "Minecraft",
+    value = "Minecraft"),
+  interactions.Choice(
+    name = "Pokemon",
+    value = "Pokemon"),
+  interactions.Choice(
+    name = "Utility",
+    value = "Utility"),
+]
+
+@bot.command(description='Reloads extension (cogs, etc)', scope = [651230389171650560], options = [interactions.Option(
+                                                                                                    type = interactions.OptionType.STRING,
+                                                                                                    name = "extension",
+                                                                                                    description = "What extension to load",
+                                                                                                    required = True,
+                                                                                                    choices = cogchoices
+                                                                                                  )])
+async def reload(ctx: CommandContext, extension):
+  await ctx.get_guild()
+  bot.reload(f'cogs.{extension}', remove_commands=False)
+  await ctx.send(f'Extension "{extension}" reloaded!')
+
+@bot.command(description = "Loads extension", scope = [651230389171650560], options = [interactions.Option(
+                                                                                        type = interactions.OptionType.STRING,
+                                                                                        name = "extension",
+                                                                                        description = "What extension to load",
+                                                                                        required = True,
+                                                                                        choices = cogchoices
+                                                                                      )])
+async def load(ctx: CommandContext, extension):
+  await ctx.get_guild()
+  bot.load(f'cogs.{extension}')
+  await ctx.send(f'Extension "{extension}" loaded')
+
+@bot.command(description = "Unloads extension", scope = [651230389171650560], options = [interactions.Option(
+                                                                                        type = interactions.OptionType.STRING,
+                                                                                        name = "extension",
+                                                                                        description = "What extension to load",
+                                                                                        required = True,
+                                                                                        choices = cogchoices
+                                                                                      )])
+async def unload(ctx: CommandContext, extension):
+  await ctx.get_guild()  
+  bot.remove(f'cogs.{extension}')
+  await ctx.send(f'Extension "{extension}" unloaded')
 
 
-@bot.command(name="reload",
-             description='Reloads extension (cogs, etc)',
-             hidden=True)
-async def reload(ctx, extension):
-  if ctx.author == bot.appinfo.owner:
-    bot.unload_extension(f'cogs.{extension}')
-    bot.load_extension(f'cogs.{extension}')
-    await ctx.reply(f'Extension "{extension}" reloaded!')
-  else:
-    ctx.reply("Insufficient Permissions")
-
-@bot.command(name="load", description = "Loads extension", hidden = True)
-async def load(ctx, extension):
-  if ctx.author == bot.appinfo.owner:
-    bot.load_extension(f'cogs.{extension}')
-    await ctx.reply(f'Extension "{extension}" loaded')
-  else:
-    ctx.reply("Insufficient Permissions")
-
-@bot.command(name= "unload", description = "Unloads extension", hidden = True)
-async def unload(ctx, extension):
-  if ctx.author == bot.appinfo.owner:
-    bot.unload_extension(f'cogs.{extension}')
-    await ctx.reply(f'Extension "{extension}" unloaded')
-  else:
-    ctx.reply("Insufficient Permissions")
-
-bot.run(TOKEN)
+bot.start()
