@@ -2,146 +2,83 @@ import difflib
 import os
 import urllib.request
 
-import discord
 import pokepy
 import pypokedex
 import requests
-from discord.ext import commands
-from discord.ext.commands.errors import TooManyArguments
-from discord_slash import SlashContext, cog_ext
-from discord_slash.model import ButtonStyle
-from discord_slash.utils.manage_commands import create_choice, create_option
+import interactions
+from interactions import CommandContext, ComponentContext
 from PIL import Image, ImageSequence
 
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix='!', intents=intents)
-client = discord.Client()
+
 pykemon = pokepy.V2Client()
 
-
-class Pokemon(commands.Cog):
+class Pokemon(interactions.Extension):
   """
   Gotta Catch Em All!
   """
-  def __init__(self, bot):
-    self.bot = bot
+  def __init__(self, bot: interactions.Client):
+      self.bot: interactions.Client = bot
 
 
-  @commands.command(aliases = ["poke"])
-  async def pokemon(self, ctx, poke, pimg = None, shiny = None):
-    """
-    Pokeedex entry for Pokemon
-    Usage: poke <pokemon> {back} 
-    {back} is optional (Defaults to `front` if left empty)
-    """
-    if pimg == "shiny":
-      pimg = None
-      shiny = "shiny"
-    await Pokemon.pokemoncmd(self, ctx, poke, pimg, shiny)
-
-  @cog_ext.cog_slash(name = "Pokedex", description= "Search up a pokemon", options = [
-      create_option(
-        name = "pokemon",
-        description = "Pokemon to search",
-        option_type = 3,
-        required = True
-      ),
-      create_option(
-        name = "sprite",
-        description = "Back sprite (Leave empty for Front)",
-        option_type = 3,
-        required = False,
-        choices = [
-          create_choice(
-            name = "front",
-            value = "front"
-          ),
-          create_choice(
-            name = "back",
-            value = "back"
-          )
-        ]
-      ),
-      create_option(
-        name = "shiny",
-        description = "Shiny sprite (Leave empty for Normal)",
-        option_type = 3,
-        required = False,
-        choices = [
-          create_choice(
-            name = "shiny",
-            value = "shiny"
-          ),
-          create_choice(
-            name = "normal",
-            value = "normal"
-          )
-        ]
-      )
-    ])
-  async def slashpokemon(self, ctx: SlashContext, pokemon: str, sprite: str = None, shiny: str = None):
-    await Pokemon.pokemoncmd(self, ctx, pokemon, sprite, shiny)
+  @interactions.extension_command(name = "pokedex", description = "Pokeedex entry for Pokemon", scope = [651230389171650560], options = [
+    interactions.Option(name = "pokemon", description = "Pokemon to search for", type = interactions.OptionType.STRING, required = True),
+    interactions.Option(name = "shiny", description = "Show shiny sprite", type = interactions.OptionType.BOOLEAN, required = False),
+    interactions.Option(name = "back", description = "Show back sprite", type = interactions.OptionType.BOOLEAN, required = False)
+  ])
+  async def slashpokemon(self, ctx: CommandContext, pokemon: str, back: str = None, shiny: str = None):
+    await Pokemon.pokemoncmd(self, ctx, pokemon, shiny, back)
 
 
-  async def pokemoncmd(self, ctx, poke, pimg, shiny):
+  async def pokemoncmd(self, ctx, poke, shiny, pimg):
+    await ctx.get_channel()
     try:
-      embed = discord.Embed(title = await self.pokename(poke), color = discord.Color.red())
+      embed = interactions.Embed(title = await self.pokename(poke), color = interactions.Color.red())
       poke = str(await self.pokename(poke)).lower()
-      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id)
-      embed.add_field(name = "Type", value = await self.ptype(poke))
-      embed.add_field(name = "Species", value = await self.pspecies(poke))
-      embed.add_field(name = "Height", value = await self.pheight(poke))
-      embed.add_field(name = "Weight", value = await self.pweight(poke))
-      embed.add_field(name = "Main Region", value = await self.region(poke))
+      embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id, inline = True)
+      embed.add_field(name = "Type", value = await self.ptype(poke), inline = True)
+      embed.add_field(name = "Species", value = await self.pspecies(poke), inline = True)
+      embed.add_field(name = "Height", value = await self.pheight(poke), inline = True)
+      embed.add_field(name = "Weight", value = await self.pweight(poke), inline = True)
+      embed.add_field(name = "Main Region", value = await self.region(poke), inline = True)
       embed.add_field(name = "Entry", value = await self.entry(poke), inline = False)
-      if shiny == "shiny":
-        if pimg == "back":
+      if shiny == True:
+        if pimg == True:
           await self.bsimg(poke)
           embed.set_image(url=f"attachment://{poke}sb.png")
-          await ctx.send(file = discord.File(f"{poke}sb.png"), embed = embed)
+          await ctx.send(files = interactions.File(filename = f"{poke}sb.png"), embeds = embed)
           os.remove(f"{poke}sb.png")
         else:
           await self.psimg(poke)
           embed.set_image(url=f"attachment://{poke}sf.png")
-          await ctx.send(file = discord.File(f"{poke}sf.png"), embed = embed)
+          await ctx.send(files = interactions.File(filename = f"{poke}sf.png"), embeds = embed)
           os.remove(f"{poke}sf.png")
       else:
-        if pimg == "back":
+        if pimg == True:
           await self.bimg(poke)
           embed.set_image(url=f"attachment://{poke}b.png")
-          await ctx.send(file = discord.File(f"{poke}b.png"), embed = embed)
+          await ctx.send(files = interactions.File(filename = f"{poke}b.png"), embeds = embed)
           os.remove(f"{poke}b.png")
         else:
           await self.pimg(poke)
           embed.set_image(url=f"attachment://{poke}.png")
-          await ctx.send(file = discord.File(f"{poke}.png"), embed = embed)
+          await ctx.send(files = interactions.File(filename = f"{poke}.png"), embeds = embed)
           os.remove(f"{poke}.png")
-    except IndexError:
-      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
-      await ctx.send(embed = embed)
+    except:
+      embed = interactions.Embed(title = 'Incorrect Input!', color = interactions.Color.red())
+      await ctx.send(embeds = embed)
 
-  @commands.command()
-  async def pitem(self, ctx, item):
-    """
-    Pokedex entry for PokeItem! 
-    Usage: pitem <item>
-    """
-    await Pokemon.pitemcmd(self, ctx, item)
 
-  @cog_ext.cog_slash(name = "PokeItem", description = "Search up any pokemon item", options = [
-      create_option(
-        name = "item",
-        description = "Item to search",
-        option_type= 3,
-        required = True
-      )
-    ])
-  async def slashpitem(self, ctx: SlashContext, item):
+  @interactions.extension_command(name = "pokeitem", description = "Search up any pokemon item", scope = [651230389171650560], options = [
+    interactions.Option(name = "item", description = "Item to search", type = interactions.OptionType.STRING, required = True)
+  ])
+  async def slashitem(self, ctx: CommandContext, item: str):
     await Pokemon.pitemcmd(self, ctx, item)
+    
 
   async def pitemcmd(self, ctx, item):
+    await ctx.get_channel()
     try:
-      embed = discord.Embed(title = await self.iname(item), color = discord.Color.green())
+      embed = interactions.Embed(title = await self.iname(item), color = interactions.Color.green())
       if not any(map(str.isdigit, item)):
         item = await self.namecheck(item)
       embed.add_field(name = "ID", value = await self.iid(item))
@@ -150,53 +87,43 @@ class Pokemon(commands.Cog):
       embed.add_field(name = "Effect", value = await self.ieffect(item))
       await self.ipic(item)
       embed.set_thumbnail(url = "attachment://item.png")
-      await ctx.send(file = discord.File("item.png"), embed = embed)
+      await ctx.send(files = interactions.File(filename = "item.png"), embeds = embed)
       os.remove("item.png")
-    except IndexError:
-      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
-      await ctx.send(embed = embed)
+    except:
+      embed = interactions.Embed(title = 'Incorrect Input!', color = interactions.Color.dark_red())
+      await ctx.send(embeds = embed)
 
-  @commands.command(aliases = ["pokedata"])
-  async def pdata(self, ctx, pokemon):
-    """
-    Pokemon Detailed Info
-    """
-    await Pokemon.pdatacmd(self, ctx, pokemon)
-
-  @cog_ext.cog_slash(name = "PokeData", description = "In-Depth data of a Pokemon", options = [
-      create_option(
-        name = "pokemon",
-        description = "Pokemon to search",
-        option_type = 3,
-        required = True  
-      )
-    ])
-  async def slashpdata(self, ctx: SlashContext, pokemon):
+  
+  @interactions.extension_command(name = "pokedata", description = "In-Depth data of a Pokemon", scope = [651230389171650560], options = [
+    interactions.Option(name = "pokemon", description = "Pokemon to search", type = interactions.OptionType.STRING, required = True)
+  ])
+  async def slashpdata(self, ctx: CommandContext, pokemon):
     await Pokemon.pdatacmd(self, ctx, pokemon)
 
 
   async def pdatacmd(self, ctx, pokemon):
+    await ctx.get_channel()
     try:
       if not any(map(str.isdigit, pokemon)):
         pokemon = await self.pknamecheck(pokemon)
       pkid = pykemon.get_pokemon(pokemon).name
       pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
       stat = pykemon.get_pokemon(pokemon)
-      embed = discord.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = discord.Color.dark_magenta())
+      embed = interactions.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = 0x8b008b)
       embed.set_image(url = pimg)
-      embed.add_field(name = "Base Stats", value = await self.pstat(pokemon))
-      embed.add_field(name = "Type", value = await self.ptype(pokemon))
-      embed.add_field(name = "Abilities", value = await self.pability(pokemon))
-      embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}')
-      embed.add_field(name = "EV Yield", value = await self.pev(pokemon))
-      embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon))
-      embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon))
-      embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon))
-      embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon))
-      await ctx.send(embed = embed)
-    except IndexError:
-      embed = discord.Embed(title = 'Incorrect Input!', color = discord.Color.dark_red())
-      await ctx.send(embed = embed)
+      embed.add_field(name = "Base Stats", value = await self.pstat(pokemon), inline = True)
+      embed.add_field(name = "Type", value = await self.ptype(pokemon), inline = True)
+      embed.add_field(name = "Abilities", value = await self.pability(pokemon), inline = True)
+      embed.add_field(name = "Height & Weight", value = f'{await self.pheight(pokemon)}/{await self.pweight(pokemon)}', inline = True)
+      embed.add_field(name = "EV Yield", value = await self.pev(pokemon), inline = True)
+      embed.add_field(name = "Growth & Capture Rates", value = await self.gcr(pokemon), inline = True)
+      embed.add_field(name = "Gender Ratio", value = await self.gender(pokemon), inline = True)
+      embed.add_field(name = "Egg Groups", value = await self.egggroup(pokemon), inline = True)
+      embed.add_field(name = "Hatch Time", value = await self.hatchtime(pokemon), inline = True)
+      await ctx.send(embeds = embed)
+    except :
+      embed = interactions.Embed(title = 'Incorrect Input!', color = interactions.Color.red())
+      await ctx.send(embeds = embed)
 
   async def pstat(self, pokemon):
     pstat = pykemon.get_pokemon(pokemon)
@@ -485,4 +412,4 @@ class Pokemon(commands.Cog):
     return f'{str(255 * (hatch + 1))} Steps'
 
 def setup(bot):
-	bot.add_cog(Pokemon(bot))
+    Pokemon(bot)
