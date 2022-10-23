@@ -6,8 +6,9 @@ class Utility(interactions.Extension):
   """
   Find out more about the bot
   """
-  def __init__(self, bot):
-    self.bot = bot
+
+  def __init__(self, bot: interactions.Client):
+      self.bot: interactions.Client = bot
 
 
   @interactions.extension_command(name = "serverinfo", description= "Info about your server", scope = [651230389171650560])

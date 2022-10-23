@@ -2,7 +2,7 @@ import interactions
 from interactions import CommandContext
 from interactions.ext.tasks import IntervalTrigger, create_task
 from configparser import ConfigParser
-import random
+import random, os
 
 
 config = ConfigParser()
@@ -21,6 +21,7 @@ TOKEN = config.get('Bot_Config', 'TOKEN')
 
 _ready: bool = False
 bot = interactions.Client(token = TOKEN, intents = interactions.Intents.DEFAULT | interactions.Intents.GUILD_PRESENCES | interactions.Intents.GUILD_MEMBERS)
+bot.load("interactions.ext.files")
 
 async def presence():
     act = random.randint(1, 5)
@@ -99,12 +100,11 @@ async def listservers():
 #    conn.close()
 #
 #
-#for filename in os.listdir('./cogs'):
-#    if filename.endswith('.py') and not filename.startswith('Owner'):
-#        bot.load_extension(f'cogs.{filename[:-3]}')
-#        print(f'cogs.{filename[:-3]}')
-#
-#
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py') and not filename.startswith('Owner'):
+        bot.load(f'cogs.{filename[:-3]}')
+        print(f'cogs.{filename[:-3]}')
+
 
 @bot.command(description = "All servers bot is in", scope = [651230389171650560])
 async def servercount(ctx: CommandContext):
