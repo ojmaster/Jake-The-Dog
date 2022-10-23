@@ -6,8 +6,8 @@ import pokepy
 import pypokedex
 import requests
 import interactions
-from interactions import CommandContext, ComponentContext
-from PIL import Image, ImageSequence
+from interactions import CommandContext
+from PIL import Image
 
 
 pykemon = pokepy.V2Client()
