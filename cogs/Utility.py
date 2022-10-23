@@ -11,7 +11,7 @@ class Utility(interactions.Extension):
       self.bot: interactions.Client = bot
 
 
-  @interactions.extension_command(name = "serverinfo", description= "Info about your server", scope = [651230389171650560])
+  @interactions.extension_command(name = "serverinfo", description= "Info about your server")
   async def serverinfo(self, ctx: CommandContext):
       await ctx.get_guild()
       embed = interactions.Embed(
@@ -37,7 +37,7 @@ class Utility(interactions.Extension):
       await ctx.send(embeds = embed)
 
 
-  @interactions.extension_command(name = "invite", description = "My invite link", scope = [651230389171650560])
+  @interactions.extension_command(name = "invite", description = "My invite link")
   async def invitecmd(self, ctx):
     embed = interactions.Embed(title = "Invite me to your server!", description= "I am also available to find in the new App Directory!", color = 0xecb53d)
     button = interactions.Button(

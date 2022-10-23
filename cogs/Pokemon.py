@@ -6,8 +6,8 @@ import pokepy
 import pypokedex
 import requests
 import interactions
-from interactions import CommandContext
-from PIL import Image
+from interactions import CommandContext, ComponentContext
+from PIL import Image, ImageSequence
 
 
 pykemon = pokepy.V2Client()
@@ -20,7 +20,7 @@ class Pokemon(interactions.Extension):
       self.bot: interactions.Client = bot
 
 
-  @interactions.extension_command(name = "pokedex", description = "Pokeedex entry for Pokemon", scope = [651230389171650560], options = [
+  @interactions.extension_command(name = "pokedex", description = "Pokeedex entry for Pokemon", options = [
     interactions.Option(name = "pokemon", description = "Pokemon to search for", type = interactions.OptionType.STRING, required = True),
     interactions.Option(name = "shiny", description = "Show shiny sprite", type = interactions.OptionType.BOOLEAN, required = False),
     interactions.Option(name = "back", description = "Show back sprite", type = interactions.OptionType.BOOLEAN, required = False)
@@ -68,7 +68,7 @@ class Pokemon(interactions.Extension):
       await ctx.send(embeds = embed)
 
 
-  @interactions.extension_command(name = "pokeitem", description = "Search up any pokemon item", scope = [651230389171650560], options = [
+  @interactions.extension_command(name = "pokeitem", description = "Search up any pokemon item", options = [
     interactions.Option(name = "item", description = "Item to search", type = interactions.OptionType.STRING, required = True)
   ])
   async def slashitem(self, ctx: CommandContext, item: str):
@@ -90,11 +90,11 @@ class Pokemon(interactions.Extension):
       await ctx.send(files = interactions.File(filename = "item.png"), embeds = embed)
       os.remove("item.png")
     except:
-      embed = interactions.Embed(title = 'Incorrect Input!', color = interactions.Color.dark_red())
+      embed = interactions.Embed(title = 'Incorrect Input!', color = interactions.Color.red())
       await ctx.send(embeds = embed)
 
   
-  @interactions.extension_command(name = "pokedata", description = "In-Depth data of a Pokemon", scope = [651230389171650560], options = [
+  @interactions.extension_command(name = "pokedata", description = "In-Depth data of a Pokemon", options = [
     interactions.Option(name = "pokemon", description = "Pokemon to search", type = interactions.OptionType.STRING, required = True)
   ])
   async def slashpdata(self, ctx: CommandContext, pokemon):

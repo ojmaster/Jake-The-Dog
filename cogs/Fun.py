@@ -15,7 +15,7 @@ class Fun(interactions.Extension):
     def __init__(self, bot: interactions.Client):
         self.bot: interactions.Client = bot
 
-    @interactions.extension_command(description="Bonk", scope = [651230389171650560])
+    @interactions.extension_command(description="Bonk")
     async def bonk(self, ctx: CommandContext):
         await ctx.get_channel()
         embed = interactions.Embed(title="", color = 0x00008B)
@@ -40,16 +40,16 @@ class Fun(interactions.Extension):
         else:
             await ctx.send(f"{slotmachine} No match, you lost 😢")
 
-    @interactions.extension_command(description = "Slots", scope = [651230389171650560])
+    @interactions.extension_command(description = "Slots")
     async def slots(self, ctx: CommandContext):
         await self.slotcmd(ctx)
 
-    @interactions.extension_user_command(name = "Slots", scope = [651230389171650560])
+    @interactions.extension_user_command(name = "Slots")
     async def slotscm(self, ctx):
         await self.slotcmd(ctx)
 
     
-    @interactions.extension_command(name = "8ball", description = "Let the wisdowm of the 8ball give you the answers you seek", scope = [651230389171650560], options = [interactions.Option(
+    @interactions.extension_command(name = "8ball", description = "Let the wisdowm of the 8ball give you the answers you seek", options = [interactions.Option(
                                                                                             type = interactions.OptionType.STRING,
                                                                                             name = "question",
                                                                                             description = "Your humble question",
@@ -64,19 +64,19 @@ class Fun(interactions.Extension):
         await ctx.send(content=f'__Question:__ {question} \n__Response:__ {msg}')
         
     
-    @interactions.extension_command(name = "coinflip", description = "Flip a coin", scope = [651230389171650560])
+    @interactions.extension_command(name = "coinflip", description = "Flip a coin")
     async def coinflip(self, ctx: CommandContext):
         await ctx.get_channel()
         coinsides = ["Heads", "Tails"]
         await ctx.send(f"**{ctx.user.username}** flipped a coin and got **{random.choice(coinsides)}**!")
 
-    @interactions.extension_user_command(name = "Coinflip", scope = [651230389171650560])
+    @interactions.extension_user_command(name = "Coinflip")
     async def coinflipcm(self, ctx: ComponentContext):
         coinsides = ["Heads", "Tails"]
         await ctx.send(f"**{ctx.user.username}** flipped a coin and got **{random.choice(coinsides)}**!")
 
 
-    @interactions.extension_command(name = "urbandictionary", description = "Look up the urban diction of your word", scope = [651230389171650560],  options = [interactions.Option(
+    @interactions.extension_command(name = "urbandictionary", description = "Look up the urban diction of your word",  options = [interactions.Option(
                                                                                                                                     type = interactions.OptionType.STRING,
                                                                                                                                     name = "search",
                                                                                                                                     description = "Word to search",
@@ -89,7 +89,7 @@ class Fun(interactions.Extension):
             title=f'__{search.capitalize()}__', description=str(term).replace("Example:", "__Example:__"), color=interactions.Color.blurple())
         await ctx.send(embed=embed)
 
-    @interactions.extension_command(name = "choose", description = "Pick from a list of choices", scope = [651230389171650560])
+    @interactions.extension_command(name = "choose", description = "Pick from a list of choices")
     @interactions.option(name = "option", required = True, type = interactions.OptionType.STRING)
     @interactions.option(name = "option2", required = True, type = interactions.OptionType.STRING)
     @interactions.option(name = "option3", required = False, type = interactions.OptionType.STRING)
@@ -105,7 +105,7 @@ class Fun(interactions.Extension):
         await ctx.send(f'{random.choice(options)}')
         
 
-    @interactions.extension_command(name = "countdown", description = "Set a timer in seconds", scope = [651230389171650560], options = [interactions.Option(
+    @interactions.extension_command(name = "countdown", description = "Set a timer in seconds", options = [interactions.Option(
                                                                                                         name = "seconds",
                                                                                                         description = "Time in seconds", 
                                                                                                         type = interactions.OptionType.INTEGER, 
@@ -125,11 +125,11 @@ class Fun(interactions.Extension):
         await ctx.edit(f"{ctx.user.mention}\n**DING DING DING :alarm_clock:**")
 
   
-    @interactions.extension_user_command(name="RIP", scope = [651230389171650560])
+    @interactions.extension_user_command(name="RIP")
     async def ripcm(self, ctx: ComponentContext):
         await ctx.send(f'R.I.P. {ctx.target.mention}\nhttps://tenor.com/bipRq.gif')
 
-    @interactions.extension_command(name = "hype", description = "HYPE HYPE HYPE HYPE!!!!", scope = [651230389171650560])
+    @interactions.extension_command(name = "hype", description = "HYPE HYPE HYPE HYPE!!!!")
     async def hypecmd(self, ctx: CommandContext):
         await ctx.get_channel()
         hypu = ['https://cdn.discordapp.com/attachments/102817255661772800/219514281136357376/tumblr_nr6ndeEpus1u21ng6o1_540.gif',
@@ -156,11 +156,11 @@ class Fun(interactions.Extension):
         await pn.create_reaction(random.choice(emojis))
 
 
-    @interactions.extension_command(name = "pun", description = "Because everybody likes a bad joke", scope = [651230389171650560])
+    @interactions.extension_command(name = "pun", description = "Because everybody likes a bad joke")
     async def pun(self, ctx: CommandContext):
         await Fun.puncmd(self, ctx)
 
-    @interactions.extension_user_command(name="Send a Pun", scope = [651230389171650560])
+    @interactions.extension_user_command(name="Send a Pun")
     async def puncm(self, ctx: ComponentContext):
         await Fun.puncmd(self, ctx)
 
@@ -210,7 +210,7 @@ class Fun(interactions.Extension):
         
 
 
-    @interactions.extension_command(name="truthordare", description="A fun game of Truth or Dare", scope = [651230389171650560], options=[
+    @interactions.extension_command(name="truthordare", description="A fun game of Truth or Dare", options=[
         interactions.Option(
             type = interactions.OptionType.USER,
             name="user",
