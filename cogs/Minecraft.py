@@ -16,6 +16,7 @@ class Minecraft(interactions.Extension):
 
     @interactions.extension_command(name = "mcplayerinfo", description = "Search a Minecraft player", options = [
         interactions.Option(name = "player", description = "Minecraft Player", type = interactions.OptionType.STRING, required = True)])
+    @interactions.autodefer()
     async def mcpcmd(self, ctx: CommandContext, player):
         uuid = MojangAPI.get_uuid(player)
         if not uuid:
@@ -37,9 +38,9 @@ class Minecraft(interactions.Extension):
     @interactions.extension_command(name = "mcserver", description = "Minecraft Java Server Info", options = [
         interactions.Option(name = "ip", description = "Minecraft Server IP", type = interactions.OptionType.STRING, required = True),
         interactions.Option(name = "port", description = "Server Port", type = interactions.OptionType.INTEGER, required = False)])
+    @interactions.autodefer()
     async def slashmcserver(self, ctx: CommandContext, ip, port = ''):
         await ctx.get_channel()
-        await ctx.defer()
         if port != '':
             mcserv = requests.get(
                 f'https://api.mcsrvstat.us/2/{ip}:{port}').json() 
@@ -87,9 +88,9 @@ class Minecraft(interactions.Extension):
     @interactions.extension_command(name = "mcbedrock", description = "Minecraft Bedrock Server Info", options = [
         interactions.Option(name = "ip", description = "Minecraft Server IP", type = interactions.OptionType.STRING, required = True),
         interactions.Option(name = "port", description = "Server Port", type = interactions.OptionType.INTEGER, required = False)])
+    @interactions.autodefer()
     async def mcbedrockcmd(self, ctx: CommandContext, ip, port = ''):
         await ctx.get_channel()
-        await ctx.defer()
         if port != '':
             mcserv = requests.get(
                 f'https://api.mcsrvstat.us/bedrock/2/{ip}:{port}').json()

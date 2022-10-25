@@ -20,11 +20,12 @@ class Pokemon(interactions.Extension):
       self.bot: interactions.Client = bot
 
 
-  @interactions.extension_command(name = "pokedex", description = "Pokeedex entry for Pokemon", options = [
+  @interactions.extension_command(name = "pokedex", description = "Pokeedex entry for Pokemon", scope = [651230389171650560], options = [
     interactions.Option(name = "pokemon", description = "Pokemon to search for", type = interactions.OptionType.STRING, required = True),
     interactions.Option(name = "shiny", description = "Show shiny sprite", type = interactions.OptionType.BOOLEAN, required = False),
     interactions.Option(name = "back", description = "Show back sprite", type = interactions.OptionType.BOOLEAN, required = False)
   ])
+  @interactions.autodefer()
   async def slashpokemon(self, ctx: CommandContext, pokemon: str, back: str = None, shiny: str = None):
     await Pokemon.pokemoncmd(self, ctx, pokemon, shiny, back)
 
@@ -32,8 +33,8 @@ class Pokemon(interactions.Extension):
   async def pokemoncmd(self, ctx, poke, shiny, pimg):
     await ctx.get_channel()
     try:
-      embed = interactions.Embed(title = await self.pokename(poke), color = interactions.Color.red())
       poke = str(await self.pokename(poke)).lower()
+      embed = interactions.Embed(title = await self.pknameformat(poke), color = interactions.Color.red())
       embed.add_field(name = "ID", value = pykemon.get_pokemon(poke).id, inline = True)
       embed.add_field(name = "Type", value = await self.ptype(poke), inline = True)
       embed.add_field(name = "Species", value = await self.pspecies(poke), inline = True)
@@ -44,7 +45,7 @@ class Pokemon(interactions.Extension):
       if shiny == True:
         if pimg == True:
           await self.bsimg(poke)
-          embed.set_image(url=f"attachment://{poke}sb.png")
+          embed.set_image(url=f"attachment://{poke}sb.png") 
           await ctx.send(files = interactions.File(filename = f"{poke}sb.png"), embeds = embed)
           os.remove(f"{poke}sb.png")
         else:
@@ -68,9 +69,10 @@ class Pokemon(interactions.Extension):
       await ctx.send(embeds = embed)
 
 
-  @interactions.extension_command(name = "pokeitem", description = "Search up any pokemon item", options = [
+  @interactions.extension_command(name = "pokeitem", description = "Search up any pokemon item", scope = [651230389171650560], options = [
     interactions.Option(name = "item", description = "Item to search", type = interactions.OptionType.STRING, required = True)
   ])
+  @interactions.autodefer()
   async def slashitem(self, ctx: CommandContext, item: str):
     await Pokemon.pitemcmd(self, ctx, item)
     
@@ -94,9 +96,10 @@ class Pokemon(interactions.Extension):
       await ctx.send(embeds = embed)
 
   
-  @interactions.extension_command(name = "pokedata", description = "In-Depth data of a Pokemon", options = [
+  @interactions.extension_command(name = "pokedata", description = "In-Depth data of a Pokemon", scope = [651230389171650560], options = [
     interactions.Option(name = "pokemon", description = "Pokemon to search", type = interactions.OptionType.STRING, required = True)
   ])
+  @interactions.autodefer()
   async def slashpdata(self, ctx: CommandContext, pokemon):
     await Pokemon.pdatacmd(self, ctx, pokemon)
 
@@ -107,9 +110,9 @@ class Pokemon(interactions.Extension):
       if not any(map(str.isdigit, pokemon)):
         pokemon = await self.pknamecheck(pokemon)
       pkid = pykemon.get_pokemon(pokemon).name
+      pkid = pkid.split('-', 1)[0]
       pimg = f'http://play.pokemonshowdown.com/sprites/xyani/{pkid}.gif'
-      stat = pykemon.get_pokemon(pokemon)
-      embed = interactions.Embed(title = await self.pokename(pokemon), description = await self.pdatadesc(pokemon), color = 0x8b008b)
+      embed = interactions.Embed(title = pkid.capitalize(), description = await self.pdatadesc(pokemon), color = 0x8b008b)
       embed.set_image(url = pimg)
       embed.add_field(name = "Base Stats", value = await self.pstat(pokemon), inline = True)
       embed.add_field(name = "Type", value = await self.ptype(pokemon), inline = True)
@@ -147,6 +150,12 @@ class Pokemon(interactions.Extension):
     pkst += "`{: >0} {: >12} {: >13}`\n".format(*row)
     return pkst
 
+
+  async def pknameformat(self, poke):
+    poke = poke.split('-', 1)[0]
+    return poke.capitalize()
+
+
   async def ptype(self, pokemon):
     pokem = pypokedex.get(name=pokemon)
     ptype = ""
@@ -158,23 +167,24 @@ class Pokemon(interactions.Extension):
 
 
   async def pokename(self, pokemon):
-    if any(map(str.isdigit, pokemon)):
-      pk = pykemon.get_pokemon_species(pokemon)
-      return pk.name.capitalize()
-    else: 
-      pk = await self.pknamecheck(pokemon)
-      return pk.capitalize()
+    if any(map(str.isdigit, str(pokemon))):
+      pokemon = pykemon.get_pokemon_species(pokemon).name
+    pk = await self.pknamecheck(pokemon)
+    return pk.capitalize()
 
   async def pdatadesc(self, pokemon):
-    return f"__**#{str(pykemon.get_pokemon(pokemon).id)} | {pykemon.get_pokemon_species(pokemon).generation.name.upper()}**__".replace(
+    pk = pokemon.split('-', 1)[0]
+    return f"__**#{str(pykemon.get_pokemon(pokemon).id)} | {pykemon.get_pokemon_species(pk).generation.name.upper()}**__".replace(
         'GENERATION-', 'Generation ')
 
   async def pspecies(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     pk = pykemon.get_pokemon_species(pokemon)
     return pk.genera[7].genus
 
 
   async def entry(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     pk = pykemon.get_pokemon_species(pokemon)
     vers = pk.generation.name
     vers = await self.gen(vers)
@@ -297,6 +307,7 @@ class Pokemon(interactions.Extension):
     return switcher.get(game, "nothing")
 
   async def region(self, gen):
+    gen = gen.split('-', 1)[0]
     return pykemon.get_generation(await self.gen(pykemon.get_pokemon_species(gen).generation.name)).main_region.name.capitalize()
 
   async def namecheck(self, iitem):
@@ -311,6 +322,11 @@ class Pokemon(interactions.Extension):
     pkm = pokemons.json()
     pkm = pkm['results']
     lst = [name['name'] for name in pkm]
+    pokemon = f"{pokemon}-"
+    pokemon = difflib.get_close_matches(pokemon, lst)[0]
+    pokemon = pokemon.split('-', 1)[0]
+    pokemon = pykemon.get_pokemon_species(pokemon).name
+    pokemon = f"{pokemon}-"
     return difflib.get_close_matches(pokemon, lst)[0]
 
   async def pability(self, pokemon):
@@ -383,6 +399,7 @@ class Pokemon(interactions.Extension):
     return switcher.get(stat, "nothing")
 
   async def gcr(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     gcr = pykemon.get_pokemon_species(pokemon)
     growth = f"{gcr.growth_rate.name.title()}/"
     capturerate = str(gcr.capture_rate)
@@ -390,10 +407,12 @@ class Pokemon(interactions.Extension):
     return growth + capturerate
 
   async def gender(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     gender = pykemon.get_pokemon_species(pokemon).gender_rate
     return "Genderless" if gender == -1 else f"{str(gender)}/8 ♀️"
 
   async def egggroup(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     egggroup = pykemon.get_pokemon_species(pokemon)
     egroup = ""
     x = 0
@@ -408,6 +427,7 @@ class Pokemon(interactions.Extension):
     return egroup
 
   async def hatchtime(self, pokemon):
+    pokemon = pokemon.split('-', 1)[0]
     hatch = pykemon.get_pokemon_species(pokemon).hatch_counter
     return f'{str(255 * (hatch + 1))} Steps'
 
